@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fhir-analytics-pipeline"
+version = "0.1.0"
+description = "Batch analytics pipeline for synthetic FHIR R4 data: Airflow, dbt, DuckDB, Azure Blob SDK on Azurite."
+requires-python = ">=3.12"
+license = { text = "MIT" }
+authors = [{ name = "Stanley Sujith Nelavala" }]
+
+[tool.setuptools.packages.find]
+where = ["src", "."]
+include = ["fhir_pipeline*", "generator*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+  "azurite: needs the Azurite blob emulator",
+  "dbt: runs dbt (needs the dbt venv or dbt on PATH)",
+  "airflow: imports Airflow (heavy)",
+  "bicep: needs az bicep",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src", "generator", "tests", "dags"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+files = ["src", "generator", "dags"]

@@ -1,0 +1,15 @@
+.venv/
+.venv-dbt/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.work/
+*.duckdb
+*.duckdb.wal
+dbt/fhir_analytics/target/
+dbt/fhir_analytics/logs/
+dbt/fhir_analytics/dbt_packages/
+.env

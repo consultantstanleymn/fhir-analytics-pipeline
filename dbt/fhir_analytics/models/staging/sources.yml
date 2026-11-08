@@ -1,0 +1,11 @@
+version: 2
+
+sources:
+  - name: raw
+    schema: raw
+    description: Append-only raw tables loaded by the Python pipeline after validation and pseudonymization.
+    tables:
+      - name: raw_patient
+      - name: raw_encounter
+      - name: raw_condition
+      - name: raw_observation

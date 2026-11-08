@@ -1,0 +1,61 @@
+version: 2
+
+models:
+  - name: stg_patient
+    description: Latest version of each pseudonymized patient.
+    columns:
+      - name: patient_token
+        data_tests: [unique, not_null]
+      - name: gender
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [male, female, other, unknown]
+  - name: stg_encounter
+    description: Latest version of each encounter, JSON flattened and typed.
+    columns:
+      - name: encounter_id
+        data_tests: [unique, not_null]
+      - name: patient_token
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_patient')
+                field: patient_token
+      - name: status
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [planned, arrived, triaged, in-progress, onleave, finished, cancelled, entered-in-error, unknown]
+      - name: class_code
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [IMP, AMB, EMER]
+  - name: stg_condition
+    columns:
+      - name: condition_id
+        data_tests: [unique, not_null]
+      - name: patient_token
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_patient')
+                field: patient_token
+      - name: encounter_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_encounter')
+                field: encounter_id
+  - name: stg_observation
+    columns:
+      - name: observation_id
+        data_tests: [unique, not_null]
+      - name: encounter_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('stg_encounter')
+                field: encounter_id

@@ -1,0 +1,65 @@
+version: 2
+
+models:
+  - name: fct_encounters
+    description: One row per encounter. Incremental on meta.lastUpdated.
+    columns:
+      - name: encounter_id
+        data_tests: [unique, not_null]
+      - name: patient_token
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_patient')
+                field: patient_token
+      - name: department_id
+        data_tests:
+          - relationships:
+              arguments:
+                to: ref('dim_department')
+                field: department_id
+      - name: class_code
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [IMP, AMB, EMER]
+  - name: dim_patient
+    columns:
+      - name: patient_token
+        data_tests: [unique, not_null]
+  - name: dim_department
+    columns:
+      - name: department_id
+        data_tests: [unique, not_null]
+      - name: department_name
+        data_tests: [unique, not_null]
+  - name: mart_readmissions_30d
+    columns:
+      - name: department
+        data_tests: [unique, not_null]
+  - name: mart_los
+    columns:
+      - name: department
+        data_tests: [unique, not_null]
+  - name: mart_encounters_weekly
+  - name: mart_condition_prevalence
+    columns:
+      - name: condition_code
+        data_tests: [unique, not_null]
+
+unit_tests:
+  - name: readmission_rate_aggregation
+    model: mart_readmissions_30d
+    given:
+      - input: ref('int_index_stays')
+        rows:
+          - {encounter_id: E1, patient_token: P1, department: Cardiology, readmitted_30d: true}
+          - {encounter_id: E2, patient_token: P1, department: Cardiology, readmitted_30d: false}
+          - {encounter_id: E3, patient_token: P2, department: Oncology, readmitted_30d: false}
+          - {encounter_id: E4, patient_token: P3, department: Oncology, readmitted_30d: true}
+    expect:
+      rows:
+        - {department: Cardiology, index_stays: 2, readmissions: 1, readmission_rate: 0.5}
+        - {department: Oncology, index_stays: 2, readmissions: 1, readmission_rate: 0.5}
+        - {department: ALL, index_stays: 4, readmissions: 2, readmission_rate: 0.5}

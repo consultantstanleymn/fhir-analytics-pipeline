@@ -1,0 +1,49 @@
+version: 2
+
+models:
+  - name: int_encounters_enriched
+    description: One row per encounter with derived flags and patient attributes.
+    columns:
+      - name: encounter_id
+        data_tests: [unique, not_null]
+  - name: int_index_stays
+    description: Index stays for the 30-day readmission metric, one row per stay.
+    columns:
+      - name: encounter_id
+        data_tests: [unique, not_null]
+      - name: readmitted_30d
+        data_tests: [not_null]
+
+unit_tests:
+  # 12 hand-written encounters. Hand-computed answer: 9 index stays, 3 readmissions.
+  # E1 -> E2 is 15 days. E5 -> E6 is exactly 30 days (counts). E7 -> E8 is 1 day.
+  # E3 -> E4 is 44 days (does not count). E10 died. E11 has no discharge yet.
+  # E12 is an outpatient visit (never an index stay, never a readmission).
+  - name: index_stays_hand_computed_fixture
+    model: int_index_stays
+    given:
+      - input: ref('fct_encounters')
+        rows:
+          - {encounter_id: E1, patient_token: P1, department: Cardiology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-01-01 08:00:00", end_at: "2026-01-05 10:00:00"}
+          - {encounter_id: E2, patient_token: P1, department: Cardiology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-01-20 08:00:00", end_at: "2026-01-25 10:00:00"}
+          - {encounter_id: E3, patient_token: P2, department: Oncology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-02-01 08:00:00", end_at: "2026-02-04 10:00:00"}
+          - {encounter_id: E4, patient_token: P2, department: Oncology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-03-20 08:00:00", end_at: "2026-03-22 10:00:00"}
+          - {encounter_id: E5, patient_token: P3, department: Cardiology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-01-10 08:00:00", end_at: "2026-01-12 10:00:00"}
+          - {encounter_id: E6, patient_token: P3, department: Cardiology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-02-11 08:00:00", end_at: "2026-02-14 10:00:00"}
+          - {encounter_id: E7, patient_token: P4, department: Oncology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-01-05 08:00:00", end_at: "2026-01-08 10:00:00"}
+          - {encounter_id: E8, patient_token: P4, department: Oncology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-01-09 08:00:00", end_at: "2026-01-10 10:00:00"}
+          - {encounter_id: E9, patient_token: P5, department: Cardiology, is_inpatient: true, is_finished: true, is_expired: false, start_at: "2026-03-01 08:00:00", end_at: "2026-03-05 10:00:00"}
+          - {encounter_id: E10, patient_token: P6, department: Cardiology, is_inpatient: true, is_finished: true, is_expired: true, start_at: "2026-03-01 08:00:00", end_at: "2026-03-05 10:00:00"}
+          - {encounter_id: E11, patient_token: P7, department: Oncology, is_inpatient: true, is_finished: false, is_expired: false, start_at: "2026-03-01 08:00:00", end_at: null}
+          - {encounter_id: E12, patient_token: P4, department: Oncology, is_inpatient: false, is_finished: true, is_expired: false, start_at: "2026-01-12 08:00:00", end_at: "2026-01-12 10:00:00"}
+    expect:
+      rows:
+        - {encounter_id: E1, readmitted_30d: true}
+        - {encounter_id: E2, readmitted_30d: false}
+        - {encounter_id: E3, readmitted_30d: false}
+        - {encounter_id: E4, readmitted_30d: false}
+        - {encounter_id: E5, readmitted_30d: true}
+        - {encounter_id: E6, readmitted_30d: false}
+        - {encounter_id: E7, readmitted_30d: true}
+        - {encounter_id: E8, readmitted_30d: false}
+        - {encounter_id: E9, readmitted_30d: false}
