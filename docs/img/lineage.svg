@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1060 336" width="1060" height="336" font-family="sans-serif" font-size="12">
+<rect width="100%" height="100%" fill="white"/>
+<text x="20" y="28" font-weight="bold" font-size="14">source</text>
+<text x="280" y="28" font-weight="bold" font-size="14">staging</text>
+<text x="540" y="28" font-weight="bold" font-size="14">intermediate</text>
+<text x="800" y="28" font-weight="bold" font-size="14">marts</text>
+<path d="M210,177.0 C245.0,177.0 245.0,177.0 280,177.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M210,101.0 C245.0,101.0 245.0,101.0 280,101.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M210,63.0 C245.0,63.0 245.0,63.0 280,63.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M210,139.0 C245.0,139.0 245.0,139.0 280,139.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M470,101.0 C505.0,101.0 505.0,63.0 540,63.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M470,177.0 C505.0,177.0 505.0,63.0 540,63.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M990,139.0 C765.0,139.0 765.0,101.0 540,101.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M470,101.0 C635.0,101.0 635.0,63.0 800,63.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M470,177.0 C635.0,177.0 635.0,101.0 800,101.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M730,101.0 C765.0,101.0 765.0,291.0 800,291.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M990,139.0 C895.0,139.0 895.0,253.0 800,253.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M990,139.0 C895.0,139.0 895.0,215.0 800,215.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M990,101.0 C895.0,101.0 895.0,177.0 800,177.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M470,63.0 C635.0,63.0 635.0,177.0 800,177.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M730,63.0 C765.0,63.0 765.0,139.0 800,139.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<path d="M990,63.0 C895.0,63.0 895.0,139.0 800,139.0" fill="none" stroke="#9aa5b1" stroke-width="1.2"/>
+<rect x="20" y="50" width="190" height="26" rx="5" fill="#e8eef7" stroke="#6b7785"/>
+<text x="28" y="67">raw_condition</text>
+<rect x="20" y="88" width="190" height="26" rx="5" fill="#e8eef7" stroke="#6b7785"/>
+<text x="28" y="105">raw_encounter</text>
+<rect x="20" y="126" width="190" height="26" rx="5" fill="#e8eef7" stroke="#6b7785"/>
+<text x="28" y="143">raw_observation</text>
+<rect x="20" y="164" width="190" height="26" rx="5" fill="#e8eef7" stroke="#6b7785"/>
+<text x="28" y="181">raw_patient</text>
+<rect x="280" y="50" width="190" height="26" rx="5" fill="#e3f2e6" stroke="#6b7785"/>
+<text x="288" y="67">stg_condition</text>
+<rect x="280" y="88" width="190" height="26" rx="5" fill="#e3f2e6" stroke="#6b7785"/>
+<text x="288" y="105">stg_encounter</text>
+<rect x="280" y="126" width="190" height="26" rx="5" fill="#e3f2e6" stroke="#6b7785"/>
+<text x="288" y="143">stg_observation</text>
+<rect x="280" y="164" width="190" height="26" rx="5" fill="#e3f2e6" stroke="#6b7785"/>
+<text x="288" y="181">stg_patient</text>
+<rect x="540" y="50" width="190" height="26" rx="5" fill="#fdf3d9" stroke="#6b7785"/>
+<text x="548" y="67">int_encounters_enriched</text>
+<rect x="540" y="88" width="190" height="26" rx="5" fill="#fdf3d9" stroke="#6b7785"/>
+<text x="548" y="105">int_index_stays</text>
+<rect x="800" y="50" width="190" height="26" rx="5" fill="#f6e0e0" stroke="#6b7785"/>
+<text x="808" y="67">dim_department</text>
+<rect x="800" y="88" width="190" height="26" rx="5" fill="#f6e0e0" stroke="#6b7785"/>
+<text x="808" y="105">dim_patient</text>
+<rect x="800" y="126" width="190" height="26" rx="5" fill="#f6e0e0" stroke="#6b7785"/>
+<text x="808" y="143">fct_encounters</text>
+<rect x="800" y="164" width="190" height="26" rx="5" fill="#f6e0e0" stroke="#6b7785"/>
+<text x="808" y="181">mart_condition_prevalence</text>
+<rect x="800" y="202" width="190" height="26" rx="5" fill="#f6e0e0" stroke="#6b7785"/>
+<text x="808" y="219">mart_encounters_weekly</text>
+<rect x="800" y="240" width="190" height="26" rx="5" fill="#f6e0e0" stroke="#6b7785"/>
+<text x="808" y="257">mart_los</text>
+<rect x="800" y="278" width="190" height="26" rx="5" fill="#f6e0e0" stroke="#6b7785"/>
+<text x="808" y="295">mart_readmissions_30d</text>
+</svg>

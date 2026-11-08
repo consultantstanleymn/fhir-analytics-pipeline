@@ -1,0 +1,128 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  PYTHON_VERSION: "3.12"
+  AZURITE_IMAGE: mcr.microsoft.com/azure-storage/azurite:3.35.0
+  # Public, documented Azurite emulator account. It is not a secret.
+  AZURITE_KEY: Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==
+  FHIR_HMAC_KEY: ci-key-not-a-secret
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install app tools (Airflow with the official constraints file)
+        run: |
+          pip install -r requirements/base.txt -c requirements/airflow-constraints.txt
+          pip install -e . --no-deps
+      - run: ruff check .
+      - run: mypy
+      - name: Install dbt and sqlfluff in an isolated venv
+        run: |
+          python -m venv .venv-dbt
+          .venv-dbt/bin/pip install -r requirements/dbt.txt
+      - name: sqlfluff (dbt templater)
+        working-directory: dbt/fhir_analytics
+        env:
+          DUCKDB_PATH: ${{ runner.temp }}/lint.duckdb
+        run: ../../.venv-dbt/bin/sqlfluff lint models tests
+
+  unit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install core dependencies (no Airflow, no dbt)
+        run: |
+          pip install -r requirements/core.txt
+          pip install -e . --no-deps
+      - name: Start Azurite
+        run: |
+          docker run -d --name azurite -p 10000:10000 "$AZURITE_IMAGE" \
+            azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
+          for i in $(seq 1 30); do (exec 3<>/dev/tcp/127.0.0.1/10000) 2>/dev/null && break || sleep 1; done
+      - name: pytest (unit)
+        env:
+          AZURITE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=${{ env.AZURITE_KEY }};BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;
+        run: python -m pytest -m "not airflow and not dbt and not bicep" -v
+
+  dbt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install core dependencies and an isolated dbt venv
+        run: |
+          pip install -r requirements/core.txt
+          pip install -e . --no-deps
+          python -m venv .venv-dbt
+          .venv-dbt/bin/pip install -r requirements/dbt.txt
+      - name: dbt build on fixtures, incremental re-run, docs generate
+        env:
+          DBT_BIN: ${{ github.workspace }}/.venv-dbt/bin/dbt
+        run: python -m pytest -m dbt -v
+
+  airflow-e2e:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+          cache-dependency-path: requirements/*.txt
+      - name: Install Airflow with the official constraints file, plus an isolated dbt venv
+        run: |
+          pip install -r requirements/base.txt -c requirements/airflow-constraints.txt
+          pip install -e . --no-deps
+          python -m venv .venv-dbt
+          .venv-dbt/bin/pip install -r requirements/dbt.txt
+      - name: Start Azurite
+        run: |
+          docker run -d --name azurite -p 10000:10000 "$AZURITE_IMAGE" \
+            azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
+          for i in $(seq 1 30); do (exec 3<>/dev/tcp/127.0.0.1/10000) 2>/dev/null && break || sleep 1; done
+      - name: DagBag test and dag.test() end to end (1,000 patients)
+        env:
+          DBT_BIN: ${{ github.workspace }}/.venv-dbt/bin/dbt
+          AZURITE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=${{ env.AZURITE_KEY }};BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;
+        run: python -m pytest -m airflow -v
+
+  bicep:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - name: Install pytest
+        run: pip install pytest
+      - name: Bicep build, lint (zero warnings) and parameter files. No az login, no deployment.
+        run: scripts/bicep_check.sh
+      - name: ARM JSON policy test (TLS, HTTPS, public access, soft delete)
+        env:
+          REQUIRE_BICEP: "1"
+        run: python -m pytest tests/test_bicep_policy.py -v
