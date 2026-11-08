@@ -48,7 +48,7 @@ def test_known_bad_resources_are_rejected_with_reason(rtype, line, reason):
 def test_bad_rows_land_in_quarantine_table(env):
     import duckdb
 
-    from fhir_pipeline.pipeline import validate_text, load_blob_as
+    from fhir_pipeline.pipeline import load_blob_as, validate_text
 
     lines = [json.dumps(GOOD["Patient"]), json.dumps({**GOOD["Patient"], "birthDate": "nope"}),
              "{broken"]

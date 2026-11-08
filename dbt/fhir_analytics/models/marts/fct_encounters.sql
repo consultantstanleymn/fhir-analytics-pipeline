@@ -26,5 +26,5 @@ select
 from {{ ref('int_encounters_enriched') }} as e
 inner join {{ ref('dim_department') }} as d on e.department = d.department_name
 {% if is_incremental() %}
-where e.last_updated > (select max(last_updated) from {{ this }})
+    where e.last_updated > (select max(last_updated) from {{ this }})
 {% endif %}

@@ -8,5 +8,7 @@ from {{ ref('mart_readmissions_30d') }} as a
 where
     a.department = 'ALL'
     and a.index_stays <> (
-        select sum(index_stays) from {{ ref('mart_readmissions_30d') }} where department <> 'ALL'
+        select sum(index_stays)
+        from {{ ref('mart_readmissions_30d') }}
+        where department <> 'ALL'
     )

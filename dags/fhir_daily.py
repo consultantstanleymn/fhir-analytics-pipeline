@@ -1,3 +1,5 @@
+# mypy: disable-error-code="call-arg,arg-type"
+# (Airflow injects `params` and XCom values into @task functions; mypy cannot see that.)
 """Airflow DAG `fhir_daily`.
 
 landing/{run_date}/*.ndjson -> validate + pseudonymize -> raw DuckDB tables ->
@@ -102,9 +104,9 @@ with DAG(
                 for m in ("fct_encounters", "dim_patient", "mart_readmissions_30d", "mart_los")
             },
         }
-        summary["published"] = publish(BlobStore(), summary["run_date"], summary)  # type: ignore[assignment]
+        summary["published"] = publish(BlobStore(), summary["run_date"], summary)
         return summary
 
-    load_results = [g.result for g in groups]  # type: ignore[attr-defined]
+    load_results = [g.result for g in groups]
     built = dbt_build_task(load_results)
     publish_task(load_results, built)

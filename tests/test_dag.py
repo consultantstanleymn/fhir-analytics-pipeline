@@ -10,7 +10,6 @@ from pathlib import Path
 
 import duckdb
 import pytest
-
 from generator.generate_fhir import generate
 
 pytestmark = pytest.mark.airflow

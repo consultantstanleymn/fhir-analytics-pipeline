@@ -1,6 +1,7 @@
 import json
 
 from generator.generate_fhir import generate, make_update_batch
+
 from fhir_pipeline.validate import Accepted, validate_line
 
 

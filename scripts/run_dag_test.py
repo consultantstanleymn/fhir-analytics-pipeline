@@ -39,9 +39,10 @@ def main() -> None:
     subprocess.run([sys.executable, "-m", "airflow", "db", "migrate"], check=True,
                    capture_output=True)
 
+    from generator.generate_fhir import generate, write_bundle
+
     from fhir_pipeline.blob import CURATED, BlobStore
     from fhir_pipeline.pipeline import upload_landing
-    from generator.generate_fhir import generate, write_bundle
 
     t0 = time.perf_counter()
     bundle = generate(args.patients, args.seed)
@@ -60,12 +61,15 @@ def main() -> None:
     dag_s = time.perf_counter() - t2
 
     summary = json.loads(store.download_bytes(CURATED, f"{args.run_date}/run_summary.json"))
+    run_results = REPO / "dbt" / "fhir_analytics" / "target" / "run_results.json"
+    dbt_s = json.loads(run_results.read_text())["elapsed_time"] if run_results.exists() else None
     report = {
         "patients": args.patients,
         "resources_generated": sum(bundle.counts.values()),
         "generate_seconds": round(gen_s, 1),
         "upload_seconds": round(upload_s, 1),
         "dag_seconds": round(dag_s, 1),
+        "dbt_build_seconds": round(dbt_s, 1) if dbt_s is not None else None,
         "curated_blobs": store.list_blobs(CURATED, f"{args.run_date}/"),
         "summary": summary,
     }
