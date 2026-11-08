@@ -185,8 +185,9 @@ def generate(n_patients: int, seed: int, *, with_edge_cases: bool = True) -> Bun
                     "effectiveDateTime": _iso(start + timedelta(minutes=rng.randint(5, 90))),
                 }
                 drop_value = rng.random() < 0.04
+                value = round(rng.uniform(lo, hi), 1)  # always drawn, keeps seeds aligned
                 if not (with_edge_cases and drop_value):  # a missing value is valid FHIR
-                    obs["valueQuantity"] = {"value": round(rng.uniform(lo, hi), 1), "unit": unit}
+                    obs["valueQuantity"] = {"value": value, "unit": unit}
                 bundle.add("Observation", obs)
             # Next visit starts 3 to 60 days after this one ends.
             cursor = end + timedelta(days=rng.randint(3, 60))

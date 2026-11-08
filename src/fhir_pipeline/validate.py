@@ -25,6 +25,19 @@ MODELS: dict[str, type[BaseModel]] = {
 }
 
 
+# `fhir.resources` checks structure and types but NOT required code bindings (a status of
+# "not-a-status" passes). We check the required bindings we rely on ourselves.
+REQUIRED_BINDINGS: dict[tuple[str, str], frozenset[str]] = {
+    ("Encounter", "status"): frozenset({
+        "planned", "arrived", "triaged", "in-progress", "onleave", "finished", "cancelled",
+        "entered-in-error", "unknown"}),
+    ("Observation", "status"): frozenset({
+        "registered", "preliminary", "final", "amended", "corrected", "cancelled",
+        "entered-in-error", "unknown"}),
+    ("Patient", "gender"): frozenset({"male", "female", "other", "unknown"}),
+}
+
+
 @dataclass(frozen=True)
 class Accepted:
     resource: dict[str, Any]
@@ -58,6 +71,9 @@ def validate_line(expected_type: str, line: str) -> Accepted | Rejected:
         MODELS[expected_type].model_validate(data)
     except ValidationError as exc:
         return Rejected(f"fhir validation: {_short_error(exc)}", line)
+    for (rtype, field), allowed in REQUIRED_BINDINGS.items():
+        if rtype == expected_type and field in data and data[field] not in allowed:
+            return Rejected(f"code binding: {field} {data[field]!r} is not allowed", line)
     # Business rules on top of the FHIR schema.
     if expected_type in ("Encounter", "Condition", "Observation"):
         ref = (data.get("subject") or {}).get("reference", "")
