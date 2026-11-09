@@ -1,0 +1,19 @@
+# Evidence: contracts gate
+label: VERIFIED LOCALLY
+date: 2026-11-09 07:37 UTC
+code commit: 916a740fdfcb885cd24c1b91467c2d6af2fc13c5
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: .venv/bin/python -m pytest tests/test_contracts_gate.py -v
+notes: Contract break fails the build; gate passes, raises and reads the env limit; DAG has the gate task before dbt; source freshness runs. Does not prove a run on GitHub Actions.
+---
+tests/test_contracts_gate.py::test_contract_break_fails PASSED           [ 11%]
+tests/test_contracts_gate.py::test_contract_holds_on_fixture PASSED      [ 22%]
+tests/test_contracts_gate.py::test_gate_passes_under_limit PASSED        [ 33%]
+tests/test_contracts_gate.py::test_gate_raises_over_limit PASSED         [ 44%]
+tests/test_contracts_gate.py::test_gate_at_exact_limit_passes_and_empty_input_passes PASSED [ 55%]
+tests/test_contracts_gate.py::test_gate_uses_env_limit PASSED            [ 66%]
+tests/test_contracts_gate.py::test_gate_default_limit_is_five_percent PASSED [ 77%]
+tests/test_contracts_gate.py::test_dag_has_gate_task_before_dbt PASSED   [ 88%]
+tests/test_contracts_gate.py::test_source_freshness_runs PASSED          [100%]
+============================== 9 passed in 23.95s ==============================
