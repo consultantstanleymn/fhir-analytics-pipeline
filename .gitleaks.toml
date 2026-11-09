@@ -1,0 +1,24 @@
+# Default gitleaks rules plus a narrow allowlist for public test values.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Public emulator and CI test values. None of these is a secret."
+# The key below is the documented public Azurite emulator account key.
+# It is published in the Azurite and Azure Storage emulator documentation.
+regexes = [
+  # Built-in Azure role definition id (public, documented by Azure).
+  '''4633458b-17de-408a-b874-0445c86b69e6''',
+  '''Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==''',
+]
+# These files hold the public emulator key by design.
+paths = [
+  '''scripts/azurite\.sh''',
+  '''\.github/workflows/ci\.yml''',
+  '''tests/conftest\.py''',
+  # Local, untracked folders (virtual environments, work files, dbt output).
+  '''\.venv(-dbt)?/''',
+  '''\.work/''',
+  '''dbt/fhir_analytics/(target|logs|dbt_packages)/''',
+  '''\.(mypy|ruff|pytest)_cache/''',
+]
