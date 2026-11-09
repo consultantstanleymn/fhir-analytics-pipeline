@@ -1,0 +1,13 @@
+# Evidence: promtool freshness
+label: VERIFIED LOCALLY
+date: 2026-11-09 09:03 UTC
+code commit: cd803de07fd5a9b95a25f15c2fac5046a10237cb
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: podman run --rm -v "$PWD/observability/rules:/r:ro,z" --entrypoint promtool docker.io/prom/prometheus:v2.55.1 test rules /r/freshness.rules.test.yml ; python3 tools/check_dashboard.py observability/grafana/fhir-pipeline.json
+notes: promtool really ran (image prom/prometheus v2.55.1). Tests: late day fires, on-time day is quiet, a 06:30 publish counts as late, 27 of 28 days is inside the budget, 26 of 28 fires the SLO alert. The Grafana dashboard was checked for structure only, not loaded into Grafana.
+---
+  SUCCESS
+exit 0
+dashboard ok
+exit 0
