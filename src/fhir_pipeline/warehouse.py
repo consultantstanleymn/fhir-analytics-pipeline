@@ -61,6 +61,13 @@ def init_schema(con: duckdb.DuckDBPyConnection) -> None:
             rows_quarantined INTEGER,
             loaded_at TIMESTAMP)"""
     )
+    con.execute(
+        """CREATE TABLE IF NOT EXISTS raw.gate_hold (
+            run_date VARCHAR PRIMARY KEY,
+            share DOUBLE,
+            tripped_at TIMESTAMP,
+            released_at TIMESTAMP)"""
+    )
 
 
 def already_loaded(con: duckdb.DuckDBPyConnection, source_blob: str) -> bool:
@@ -68,6 +75,46 @@ def already_loaded(con: duckdb.DuckDBPyConnection, source_blob: str) -> bool:
         "SELECT count(*) FROM raw.load_log WHERE source_blob = ?", [source_blob]
     ).fetchone()
     return bool(row and row[0])
+
+
+def stored_run_totals(con: duckdb.DuckDBPyConnection, run_date: str) -> tuple[int, int]:
+    """Return (rows_in, rows_quarantined) from the load log for all blobs of one run date."""
+    row = con.execute(
+        "SELECT coalesce(sum(rows_in), 0), coalesce(sum(rows_quarantined), 0) "
+        "FROM raw.load_log WHERE source_blob LIKE ?",
+        [f"%/{run_date}/%"],
+    ).fetchone()
+    return (int(row[0]), int(row[1])) if row else (0, 0)
+
+
+def hold_state(con: duckdb.DuckDBPyConnection, run_date: str) -> str | None:
+    """Return None (no hold), 'held' or 'released' for one run date."""
+    row = con.execute(
+        "SELECT released_at IS NOT NULL FROM raw.gate_hold WHERE run_date = ?", [run_date]
+    ).fetchone()
+    if row is None:
+        return None
+    return "released" if row[0] else "held"
+
+
+def record_hold(con: duckdb.DuckDBPyConnection, run_date: str, share: float) -> None:
+    """Record a tripped gate. A released hold stays released."""
+    if hold_state(con, run_date) is None:
+        con.execute(
+            "INSERT INTO raw.gate_hold VALUES (?, ?, ?, NULL)",
+            [run_date, share, datetime.now(UTC).replace(tzinfo=None)],
+        )
+
+
+def release_hold(con: duckdb.DuckDBPyConnection, run_date: str) -> bool:
+    """Release the hold on purpose. Return False when the run date has no open hold."""
+    if hold_state(con, run_date) != "held":
+        return False
+    con.execute(
+        "UPDATE raw.gate_hold SET released_at = ? WHERE run_date = ?",
+        [datetime.now(UTC).replace(tzinfo=None), run_date],
+    )
+    return True
 
 
 def load_resources(

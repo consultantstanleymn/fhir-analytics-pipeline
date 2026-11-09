@@ -121,3 +121,44 @@ def test_source_freshness_runs(env: Path, dbt_bin: str, monkeypatch: pytest.Monk
     # An empty source table has no load time, so dbt reports it as an error.
     assert res["sources"]["raw_condition"] == "error"
     assert res["ok"] is False
+
+
+def _load_bad_day(run_date: str) -> list[dict[str, object]]:
+    """Load one resource type where 10 of 20 lines are bad. Return the load stats."""
+    rows = []
+    for i in range(10):
+        rows.append(
+            f'{{"resourceType":"Patient","id":"p{i}","gender":"female","birthDate":"1980-01-01",'
+            '"meta":{"lastUpdated":"2026-01-01T00:00:00Z"}}'
+        )
+    rows += [f"{{broken line {i}" for i in range(10)]
+    stats = pipeline.validate_text(run_date, "Patient", "\n".join(rows) + "\n")
+    blob = f"landing/{run_date}/Patient.ndjson"
+    load = pipeline.load_blob_as(run_date, "Patient", stats["rows_in"], blob)
+    return [{**stats, **load}]
+
+
+def test_gate_holds_on_rerun_after_trip(env: Path) -> None:
+    """A re-run loads 0 rows. The gate must still count the stored rows and stay tripped."""
+    first = _load_bad_day("2026-02-01")
+    with pytest.raises(pipeline.QuarantineGateError):
+        pipeline.check_quarantine_rate(first, 0.05, run_date="2026-02-01")
+    rerun = [{"rows_in": 0, "rows_loaded": 0, "rows_quarantined": 0, "skipped": 1}]
+    with pytest.raises(pipeline.QuarantineGateError, match="above the limit"):
+        pipeline.check_quarantine_rate(rerun, 0.05, run_date="2026-02-01")
+
+
+def test_gate_hold_clears_when_cause_is_resolved_or_released(env: Path) -> None:
+    first = _load_bad_day("2026-02-02")
+    rerun = [{"skipped": 1}]
+    with pytest.raises(pipeline.QuarantineGateError):
+        pipeline.check_quarantine_rate(first, 0.05, run_date="2026-02-02")
+    # Cause resolved: the limit is raised on purpose, the stored share is under it.
+    assert pipeline.check_quarantine_rate(rerun, 0.6, run_date="2026-02-02")["ok"]
+    # Explicit release: the set is accepted, the gate then passes at the old limit.
+    with pytest.raises(pipeline.QuarantineGateError):
+        pipeline.check_quarantine_rate(rerun, 0.05, run_date="2026-02-02")
+    assert pipeline.release_quarantine_hold("2026-02-02") is True
+    assert pipeline.check_quarantine_rate(rerun, 0.05, run_date="2026-02-02")["ok"]
+    # Another day is not affected.
+    assert pipeline.check_quarantine_rate(rerun, 0.05, run_date="2026-02-03")["ok"]

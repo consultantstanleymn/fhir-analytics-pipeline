@@ -134,7 +134,7 @@ def run_day(store: Any, run_date: str, *, build: bool = True, publish_day: bool 
         loads.append({**stats, **pipeline.load_blob(run_date, rtype, stats["rows_in"])})
         inputs[pipeline.landing_blob(run_date, rtype)] = stats["input_sha256"]
     result: dict[str, Any] = {"found": sorted(found), "loads": loads}
-    result["gate"] = pipeline.check_quarantine_rate(loads)  # raises QuarantineGateError over the limit
+    result["gate"] = pipeline.check_quarantine_rate(loads, run_date=run_date)  # raises QuarantineGateError over the limit
     if build:
         result["dbt"] = pipeline.dbt_build()
         if publish_day:
@@ -201,6 +201,15 @@ def case_corrupt_blob(root: Path) -> None:
     expect("gate stops the run when the share is too high", raised is not None)
     expect("marts are unchanged after a stopped run", fct(root) == pre_marts)
     expect("nothing is published for the stopped day", curated(store, "2026-03-03") == [])
+    # Re-run the same day with no fix. The load log skips the blobs, but the gate must still trip.
+    try:
+        run_day(store, "2026-03-03")
+        rerun = None
+    except QuarantineGateError as exc:
+        rerun = str(exc)
+    say(f"day 3 re-run (0 rows loaded): {rerun}")
+    expect("gate still stops the re-run after a trip", rerun is not None)
+    expect("marts are unchanged after the re-run", fct(root) == pre_marts)
     say("data effect: bad lines are kept in raw.quarantine with the reason and the raw text. Good lines load.")
 
 

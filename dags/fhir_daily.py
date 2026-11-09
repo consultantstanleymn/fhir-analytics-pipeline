@@ -93,12 +93,12 @@ with DAG(
         first >> second
 
     @task
-    def quarantine_gate(loads: list[dict[str, Any]]) -> dict[str, Any]:
+    def quarantine_gate(loads: list[dict[str, Any]], params: dict[str, Any]) -> dict[str, Any]:
         from fhir_pipeline.metrics import timed
         from fhir_pipeline.pipeline import check_quarantine_rate
 
         with timed("quarantine_gate"):
-            return check_quarantine_rate(loads)
+            return check_quarantine_rate(loads, run_date=_run_date(params))
 
     @task
     def source_freshness(loads: list[dict[str, Any]]) -> dict[str, Any]:

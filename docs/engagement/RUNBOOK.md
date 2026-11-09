@@ -13,7 +13,10 @@ Symptom: the task `quarantine_gate` fails with "quarantine share ... is above th
 
 The marts do not change when the gate stops a run.
 
-Known gap: the gate counts only the rows that the current attempt loads. The rows of the stopped day stay in the raw tables, and the load log marks those blobs as loaded. A re-run loads nothing, so the gate passes, and dbt then builds the marts with the good rows of that day. If those rows must not reach the marts, remove them before the re-run (see "Load the same day again" in `docs/RUNBOOK.md`).
+The gate holds on a re-run. A re-run loads 0 new rows, but the gate reads the stored rows of the run date from `raw.load_log`. The gate stays tripped until one of these happens:
+
+- The stored share falls under the limit. Raise `FHIR_MAX_QUARANTINE_SHARE` for the run, or remove the bad rows (see "Load the same day again" in `docs/RUNBOOK.md`).
+- You release the quarantined set on purpose: `.venv/bin/python -c "from fhir_pipeline.pipeline import release_quarantine_hold as r; print(r('YYYY-MM-DD'))"`. The command prints `True` when it released a hold. Release only after you accept the quarantined rows. The record stays in `raw.gate_hold`.
 
 ## The marts-late alert fired
 

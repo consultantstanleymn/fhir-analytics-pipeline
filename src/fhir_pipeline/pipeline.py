@@ -20,7 +20,17 @@ from .kanon import enforce_k, get_k
 from .provenance import build_manifest, git_sha, sha256_bytes
 from .pseudonymize import load_keyring, pseudonymize
 from .validate import Accepted, validate_line
-from .warehouse import RAW_TABLES, already_loaded, connect, init_schema, load_resources
+from .warehouse import (
+    RAW_TABLES,
+    already_loaded,
+    connect,
+    hold_state,
+    init_schema,
+    load_resources,
+    record_hold,
+    release_hold,
+    stored_run_totals,
+)
 
 RESOURCE_ORDER = ("Patient", "Encounter", "Condition", "Observation")
 MARTS = [
@@ -176,26 +186,59 @@ def _safe_metric(fn: Any, *args: Any) -> None:
         pass
 
 
-def check_quarantine_rate(loads: list[dict[str, Any]], max_share: float | None = None) -> dict[str, Any]:
+def check_quarantine_rate(
+    loads: list[dict[str, Any]], max_share: float | None = None, run_date: str | None = None
+) -> dict[str, Any]:
     """Quarantine-rate gate. Fails the run when rejected rows pass `max_share` of all input rows.
 
     Each item in `loads` needs `rows_in` and `rows_quarantined` (missing keys count as 0, so a
     skipped resource adds nothing). The limit comes from FHIR_MAX_QUARANTINE_SHARE (default 0.05).
+
+    With `run_date`, the gate also counts the rows that earlier attempts stored in `raw.load_log`.
+    A re-run after a trip loads 0 rows, but the gate still sees the stored rows and stays tripped.
+    The hold ends when the share falls under the limit or `release_quarantine_hold` is called.
     """
     if max_share is None:
         max_share = float(os.environ.get(MAX_QUARANTINE_ENV, DEFAULT_MAX_QUARANTINE_SHARE))
     rows_in = sum(int(x.get("rows_in", 0)) for x in loads)
     quarantined = sum(int(x.get("rows_quarantined", 0)) for x in loads)
+    released = False
+    if run_date is not None:
+        con = connect()
+        try:
+            init_schema(con)
+            stored_in, stored_bad = stored_run_totals(con, run_date)
+            # Stored totals include this attempt's rows, so take the larger view.
+            rows_in, quarantined = max(rows_in, stored_in), max(quarantined, stored_bad)
+            released = hold_state(con, run_date) == "released"
+            share = quarantined / rows_in if rows_in else 0.0
+            if share > max_share and not released:
+                record_hold(con, run_date, share)
+        finally:
+            con.close()
     share = quarantined / rows_in if rows_in else 0.0
+    ok = share <= max_share or released
     result = {"rows_in": rows_in, "quarantined": quarantined, "share": round(share, 6),
-              "max_share": max_share, "ok": share <= max_share}
+              "max_share": max_share, "ok": ok}
+    if released:
+        result["released"] = True
     _safe_metric(metrics.record_quarantine_share, share)
-    if not result["ok"]:
+    if not ok:
         raise QuarantineGateError(
             f"quarantine share {share:.4f} is above the limit {max_share:.4f} "
             f"({quarantined} of {rows_in} rows)"
         )
     return result
+
+
+def release_quarantine_hold(run_date: str) -> bool:
+    """Release the gate hold of one run date on purpose. Return False when no hold is open."""
+    con = connect()
+    try:
+        init_schema(con)
+        return release_hold(con, run_date)
+    finally:
+        con.close()
 
 
 def dbt_source_freshness() -> dict[str, Any]:
