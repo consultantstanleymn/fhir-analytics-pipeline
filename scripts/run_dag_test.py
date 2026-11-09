@@ -61,6 +61,7 @@ def main() -> None:
     dag_s = time.perf_counter() - t2
 
     summary = json.loads(store.download_bytes(CURATED, f"{args.run_date}/run_summary.json"))
+    provenance = json.loads(store.download_bytes(CURATED, f"{args.run_date}/provenance.json"))
     run_results = REPO / "dbt" / "fhir_analytics" / "target" / "run_results.json"
     dbt_s = json.loads(run_results.read_text())["elapsed_time"] if run_results.exists() else None
     report = {
@@ -72,6 +73,7 @@ def main() -> None:
         "dbt_build_seconds": round(dbt_s, 1) if dbt_s is not None else None,
         "curated_blobs": store.list_blobs(CURATED, f"{args.run_date}/"),
         "summary": summary,
+        "provenance": provenance,
     }
     print("REPORT_JSON=" + json.dumps(report))
 

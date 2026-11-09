@@ -122,7 +122,14 @@ with DAG(
                 for m in ("fct_encounters", "dim_patient", "mart_readmissions_30d", "mart_los")
             },
         }
-        summary["published"] = publish(BlobStore(), summary["run_date"], summary)
+        from fhir_pipeline.pipeline import landing_blob
+
+        inputs = {
+            landing_blob(summary["run_date"], x["resource_type"]): x["input_sha256"]
+            for x in loads
+            if x.get("input_sha256")
+        }
+        summary["published"] = publish(BlobStore(), summary["run_date"], summary, inputs)
         return summary
 
     load_results = [g.result for g in groups]

@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from .blob import CURATED, LANDING, BlobStore
+from .provenance import build_manifest, git_sha, sha256_bytes
 from .pseudonymize import load_key, pseudonymize
 from .validate import Accepted, validate_line
 from .warehouse import RAW_TABLES, already_loaded, connect, init_schema, load_resources
@@ -77,8 +78,10 @@ def list_new_blobs(store: BlobStore, run_date: str) -> dict[str, str]:
 
 def validate_blob(store: BlobStore, run_date: str, rtype: str) -> dict[str, Any]:
     """Download one blob, validate each line, pseudonymize valid rows, write local files."""
-    data = store.download_bytes(LANDING, landing_blob(run_date, rtype)).decode("utf-8")
-    return validate_text(run_date, rtype, data)
+    raw = store.download_bytes(LANDING, landing_blob(run_date, rtype))
+    stats = validate_text(run_date, rtype, raw.decode("utf-8"))
+    stats["input_sha256"] = sha256_bytes(raw)  # hash of the blob as stored, for the manifest
+    return stats
 
 
 def validate_text(run_date: str, rtype: str, data: str) -> dict[str, Any]:
@@ -201,8 +204,29 @@ def dbt_source_freshness() -> dict[str, Any]:
     return {"sources": sources, "ok": all(v != "error" for v in sources.values())}
 
 
-def publish(store: BlobStore, run_date: str, summary: dict[str, Any]) -> list[str]:
-    """Export marts to Parquet, upload to curated/{run_date}/, upload the run summary."""
+STAGING_MODELS = ["stg_patient", "stg_encounter", "stg_condition", "stg_observation"]
+DBT_MANIFEST = REPO_ROOT / "dbt" / "fhir_analytics" / "target" / "manifest.json"
+
+
+def layer_counts() -> dict[str, dict[str, int]]:
+    """Row counts per layer: raw tables, staging views and marts."""
+    return {
+        "raw": raw_counts(),
+        "staging": {m: table_count(f"staging.{m}") for m in STAGING_MODELS},
+        "marts": {m: table_count(f"marts.{m}") for m in MARTS},
+    }
+
+
+def publish(
+    store: BlobStore,
+    run_date: str,
+    summary: dict[str, Any],
+    inputs: dict[str, str] | None = None,
+) -> list[str]:
+    """Export marts to Parquet, upload to curated/{run_date}/, upload manifest and run summary.
+
+    `inputs` maps each landing blob name to its SHA-256, captured when the blob was validated.
+    """
     store.ensure_container(CURATED)
     out = work_dir() / run_date / "curated"
     out.mkdir(parents=True, exist_ok=True)
@@ -222,13 +246,20 @@ def publish(store: BlobStore, run_date: str, summary: dict[str, Any]) -> list[st
             names.append(blob)
     finally:
         con.close()
+    manifest = build_manifest(
+        run_date, dict(inputs or {}), git_sha(), DBT_MANIFEST, layer_counts()
+    )
+    blob = f"{run_date}/provenance.json"
+    store.upload_bytes(CURATED, blob, json.dumps(manifest, indent=2).encode())
+    names.append(blob)
+    summary["provenance"] = blob
     blob = f"{run_date}/run_summary.json"
     store.upload_bytes(CURATED, blob, json.dumps(summary, indent=2).encode())
     names.append(blob)
     return names
 
 
-_TABLE_RE = re.compile(r"^(raw|marts)\.[a-z_0-9]+$")
+_TABLE_RE = re.compile(r"^(raw|staging|marts)\.[a-z_0-9]+$")
 
 
 def table_count(table: str) -> int:

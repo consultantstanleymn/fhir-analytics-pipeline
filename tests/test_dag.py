@@ -83,7 +83,7 @@ def test_dag_end_to_end_1000_patients(azurite_conn, dbt_bin, tmp_path):
     assert names == {
         "fct_encounters.parquet", "dim_patient.parquet", "dim_department.parquet",
         "mart_readmissions_30d.parquet", "mart_los.parquet", "mart_encounters_weekly.parquet",
-        "mart_condition_prevalence.parquet", "run_summary.json"}
+        "mart_condition_prevalence.parquet", "provenance.json", "run_summary.json"}
 
     # The published Parquet files are real and match the warehouse.
     from fhir_pipeline.blob import CURATED, BlobStore
@@ -97,6 +97,25 @@ def test_dag_end_to_end_1000_patients(azurite_conn, dbt_bin, tmp_path):
     n_wh = wh.execute("select count(*) from marts.fct_encounters").fetchone()
     assert n_parquet == n_wh
     assert n_wh[0] == summary["mart_rows"]["fct_encounters"]
+
+    # The provenance manifest is valid and its input hashes match the landing blobs.
+    import hashlib
+
+    import jsonschema
+
+    from fhir_pipeline import provenance
+
+    manifest = json.loads(store.download_bytes(CURATED, "2026-02-02/provenance.json"))
+    jsonschema.validate(manifest, provenance.load_schema())
+    assert manifest == report["provenance"]
+    assert len(manifest["inputs"]) == 4
+    for item in manifest["inputs"]:
+        landing = store.download_bytes("landing", item["blob"])
+        assert hashlib.sha256(landing).hexdigest() == item["sha256"]
+    assert manifest["row_counts"]["marts"]["dim_patient"] == 1000
+    patients = summary["resources"]["Patient"]
+    assert manifest["row_counts"]["raw"]["raw_patient"] == patients["loaded"]
+    assert summary["provenance"] == "2026-02-02/provenance.json"
 
     # No direct identifier reached the warehouse.
     leaked = wh.execute(
