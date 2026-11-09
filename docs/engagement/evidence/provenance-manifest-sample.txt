@@ -1,0 +1,23 @@
+# Evidence: provenance manifest sample
+label: VERIFIED LOCALLY
+date: 2026-11-09 07:46 UTC
+code commit: 0c17e5165716c1f5cbc977417a1e2016b9aa8ba8
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: .venv/bin/python -m pytest tests/test_provenance.py -v (Azurite running; scripts/azurite.sh start)
+notes: Companion header for provenance-manifest-sample.json. The JSON file is the manifest from a 1,000-patient DAG run on Azurite. Proves the manifest is written and valid. It does not prove any cloud run.
+---
+tests/test_provenance.py::test_manifest_validates_against_schema PASSED  [ 10%]
+tests/test_provenance.py::test_schema_rejects_bad_manifest PASSED        [ 20%]
+tests/test_provenance.py::test_input_hashes_match_content PASSED         [ 30%]
+tests/test_provenance.py::test_ready_hash_is_kept PASSED                 [ 40%]
+tests/test_provenance.py::test_dbt_manifest_hash_is_file_hash PASSED     [ 50%]
+tests/test_provenance.py::test_missing_dbt_manifest_is_error PASSED      [ 60%]
+tests/test_provenance.py::test_git_sha_prefers_env PASSED                [ 70%]
+tests/test_provenance.py::test_git_sha_falls_back_to_git_or_unknown PASSED [ 80%]
+tests/test_provenance.py::test_publish_uploads_manifest PASSED           [ 90%]
+tests/test_provenance.py::test_dag_run_writes_manifest PASSED            [100%]
+============================= 10 passed in 34.43s ==============================
+
+sample file: docs/engagement/evidence/provenance-manifest-sample.json (1,000-patient DAG run, run date 2026-02-02, code sha equals the code commit above)
+sample validates against provenance.schema.json

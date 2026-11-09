@@ -1,0 +1,47 @@
+{
+  "run_date": "2026-02-02",
+  "code_sha": "0c17e5165716c1f5cbc977417a1e2016b9aa8ba8",
+  "inputs": [
+    {
+      "blob": "2026-02-02/Condition.ndjson",
+      "sha256": "9ee90039c2433e88e3a257c7f975af45d49eec6de5a0842dcd63e1a558baaa29"
+    },
+    {
+      "blob": "2026-02-02/Encounter.ndjson",
+      "sha256": "dc3d00acc4392d13ca7769ce578d498ff961abf499e3561edcc319a7f96091f0"
+    },
+    {
+      "blob": "2026-02-02/Observation.ndjson",
+      "sha256": "1d117be0815ad7df9808865d5f7e3427b8ae93a6803d3282e3945dd603d5951f"
+    },
+    {
+      "blob": "2026-02-02/Patient.ndjson",
+      "sha256": "6356aca1b5fa00443052818ee25127cad38878594702dbcd19514e7eb8bf14ab"
+    }
+  ],
+  "dbt_manifest_sha256": "cb2eaacd64786cdb7165bf7652932e19be848e1d15cc7c35cde6de0a79fe8b34",
+  "row_counts": {
+    "raw": {
+      "raw_patient": 1020,
+      "raw_encounter": 1280,
+      "raw_condition": 1214,
+      "raw_observation": 2473
+    },
+    "staging": {
+      "stg_patient": 1000,
+      "stg_encounter": 1240,
+      "stg_condition": 1194,
+      "stg_observation": 2453
+    },
+    "marts": {
+      "fct_encounters": 1240,
+      "dim_patient": 1000,
+      "dim_department": 7,
+      "mart_readmissions_30d": 8,
+      "mart_los": 7,
+      "mart_encounters_weekly": 191,
+      "mart_condition_prevalence": 8
+    }
+  },
+  "generated_at": "2026-11-09T07:42:06Z"
+}
