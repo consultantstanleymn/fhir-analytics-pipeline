@@ -1,0 +1,39 @@
+# Evidence: final gate local
+label: VERIFIED LOCALLY
+date: 2026-11-09 12:13 UTC
+code commit: 3eed2c4b6bfae9900dc0e77126dcd9268bec2313
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: ruff, mypy, then pytest by mark: fast, azurite, dbt, airflow, bicep (see === lines)
+notes: Full gate at the end of the engagement: 106 tests in total (88 fast, 5 Azurite, 10 dbt, 2 Airflow only, 1 Bicep). Total run about 3.5 minutes, measured on one laptop. Does not prove any GitHub Actions run.
+---
+=== .venv/bin/ruff check .
+All checks passed!
+exit 0 duration 0s
+=== .venv/bin/mypy
+dags/fhir_daily.py:60: note: "__call__" is considered instance variable, to make it class variable use ClassVar[...]
+dags/fhir_daily.py:87: note: "__call__" is considered instance variable, to make it class variable use ClassVar[...]
+dags/fhir_daily.py:169: note: "__call__" is considered instance variable, to make it class variable use ClassVar[...]
+Success: no issues found in 12 source files
+exit 0 duration 1s
+=== .venv/bin/python -m pytest -q -m not airflow and not dbt and not bicep and not azurite
+........................................................................ [ 81%]
+................                                                         [100%]
+88 passed, 18 deselected in 2.76s
+exit 0 duration 3s
+=== .venv/bin/python -m pytest -q -m azurite
+.....                                                                    [100%]
+5 passed, 101 deselected in 74.57s (0:01:14)
+exit 0 duration 75s
+=== .venv/bin/python -m pytest -q -m dbt
+..........                                                               [100%]
+10 passed, 96 deselected in 119.77s (0:01:59)
+exit 0 duration 120s
+=== .venv/bin/python -m pytest -q -m airflow and not azurite
+..                                                                       [100%]
+2 passed, 104 deselected in 4.62s
+exit 0 duration 5s
+=== .venv/bin/python -m pytest -q -m bicep
+.                                                                        [100%]
+1 passed, 105 deselected in 3.60s
+exit 0 duration 4s

@@ -29,6 +29,7 @@ Each line ran on one laptop on 2026-11-09. Raw output is in `docs/engagement/evi
 
 | Claim | Command | Evidence file |
 |---|---|---|
+| Full gate at the end: 106 tests pass (88 fast, 5 Azurite, 10 dbt, 2 Airflow, 1 Bicep), ruff and mypy clean | see the file | `docs/engagement/evidence/final-gate-local.txt` |
 | Baseline: lint, types, unit, Azurite, dbt and Airflow tests pass before the engagement work | see the file | `docs/engagement/evidence/baseline-local.txt` |
 | dbt contracts on all marts, with a test that a contract break fails the build; source freshness checks; a quarantine-rate gate that stops a run over 5 percent | `.venv/bin/python -m pytest tests/test_contracts_gate.py -v` | `docs/engagement/evidence/contracts-gate.txt` |
 | A provenance manifest for every run (input hashes, code SHA, dbt manifest hash, row counts), checked against a JSON schema | `.venv/bin/python -m pytest tests/test_provenance.py -v` | `docs/engagement/evidence/provenance-manifest-sample.txt` and `.json` |
