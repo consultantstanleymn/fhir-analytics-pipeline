@@ -2,7 +2,8 @@
     config(
         materialized='incremental',
         unique_key='encounter_id',
-        incremental_strategy='delete+insert'
+        incremental_strategy='delete+insert',
+        on_schema_change='fail'
     )
 }}
 

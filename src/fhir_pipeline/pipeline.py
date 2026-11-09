@@ -135,8 +135,9 @@ def dbt_command() -> list[str]:
     return [binary]
 
 
-def run_dbt(args: list[str]) -> subprocess.CompletedProcess[str]:
-    project = REPO_ROOT / "dbt" / "fhir_analytics"
+def run_dbt(args: list[str], project: Path | None = None) -> subprocess.CompletedProcess[str]:
+    """Run dbt in the repo project, or in another project dir (tests copy the project)."""
+    project = project or REPO_ROOT / "dbt" / "fhir_analytics"
     env = {**os.environ, "DBT_PROFILES_DIR": str(project)}
     cmd = [*dbt_command(), *args, "--project-dir", str(project), "--profiles-dir", str(project)]
     return subprocess.run(cmd, env=env, capture_output=True, text=True, check=False)

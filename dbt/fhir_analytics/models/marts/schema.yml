@@ -3,10 +3,15 @@ version: 2
 models:
   - name: fct_encounters
     description: One row per encounter. Incremental on meta.lastUpdated.
+    config:
+      contract:
+        enforced: true
     columns:
       - name: encounter_id
+        data_type: varchar
         data_tests: [unique, not_null]
       - name: patient_token
+        data_type: varchar
         data_tests:
           - not_null
           - relationships:
@@ -14,39 +19,126 @@ models:
                 to: ref('dim_patient')
                 field: patient_token
       - name: department_id
+        data_type: varchar
         data_tests:
           - relationships:
               arguments:
                 to: ref('dim_department')
                 field: department_id
+      - name: department
+        data_type: varchar
+      - name: status
+        data_type: varchar
       - name: class_code
+        data_type: varchar
         data_tests:
           - accepted_values:
               arguments:
                 values: [IMP, AMB, EMER]
+      - name: is_inpatient
+        data_type: boolean
+      - name: is_finished
+        data_type: boolean
+      - name: is_expired
+        data_type: boolean
+      - name: start_at
+        data_type: timestamp
+      - name: end_at
+        data_type: timestamp
+      - name: los_days
+        data_type: bigint
+      - name: last_updated
+        data_type: timestamp
+      - name: dbt_loaded_at
+        data_type: timestamp with time zone
   - name: dim_patient
+    config:
+      contract:
+        enforced: true
     columns:
       - name: patient_token
+        data_type: varchar
         data_tests: [unique, not_null]
+      - name: mrn_token
+        data_type: varchar
+      - name: gender
+        data_type: varchar
+      - name: birth_year
+        data_type: integer
+      - name: birth_decade
+        data_type: double
+      - name: state
+        data_type: varchar
   - name: dim_department
+    config:
+      contract:
+        enforced: true
     columns:
       - name: department_id
+        data_type: varchar
         data_tests: [unique, not_null]
       - name: department_name
+        data_type: varchar
         data_tests: [unique, not_null]
   - name: mart_readmissions_30d
+    config:
+      contract:
+        enforced: true
     columns:
       - name: department
+        data_type: varchar
         data_tests: [unique, not_null]
+      - name: index_stays
+        data_type: hugeint
+      - name: readmissions
+        data_type: hugeint
+      - name: readmission_rate
+        data_type: double
   - name: mart_los
+    config:
+      contract:
+        enforced: true
     columns:
       - name: department
+        data_type: varchar
         data_tests: [unique, not_null]
+      - name: stays
+        data_type: bigint
+      - name: avg_los_days
+        data_type: double
+      - name: median_los_days
+        data_type: double
+      - name: p90_los_days
+        data_type: double
   - name: mart_encounters_weekly
+    config:
+      contract:
+        enforced: true
+    columns:
+      - name: week_start
+        data_type: date
+      - name: department
+        data_type: varchar
+      - name: encounters
+        data_type: bigint
+      - name: inpatient_encounters
+        data_type: bigint
   - name: mart_condition_prevalence
+    config:
+      contract:
+        enforced: true
     columns:
       - name: condition_code
+        data_type: varchar
         data_tests: [unique, not_null]
+      - name: condition_display
+        data_type: varchar
+      - name: patients_with_condition
+        data_type: bigint
+      - name: total_patients
+        data_type: bigint
+      - name: prevalence
+        data_type: double
 
 unit_tests:
   - name: readmission_rate_aggregation
