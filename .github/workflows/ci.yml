@@ -40,6 +40,10 @@ jobs:
         env:
           DUCKDB_PATH: ${{ runner.temp }}/lint.duckdb
         run: ../../.venv-dbt/bin/sqlfluff lint models tests
+      - name: Check the Grafana dashboard and the control map links
+        run: |
+          python3 tools/check_dashboard.py observability/grafana/fhir-pipeline.json
+          python3 scripts/check_map_links.py docs/engagement/HIPAA-STYLE-MAP.md
 
   unit:
     runs-on: ubuntu-latest
@@ -58,7 +62,10 @@ jobs:
         run: |
           docker run -d --name azurite -p 10000:10000 "$AZURITE_IMAGE" \
             azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
-          for i in $(seq 1 30); do (exec 3<>/dev/tcp/127.0.0.1/10000) 2>/dev/null && break || sleep 1; done
+          for _ in $(seq 1 30); do
+            if (exec 3<>/dev/tcp/127.0.0.1/10000) 2>/dev/null; then break; fi
+            sleep 1
+          done
       - name: pytest (unit)
         env:
           AZURITE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=${{ env.AZURITE_KEY }};BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;
@@ -79,7 +86,7 @@ jobs:
           pip install -e . --no-deps
           python -m venv .venv-dbt
           .venv-dbt/bin/pip install -r requirements/dbt.txt
-      - name: dbt build on fixtures, incremental re-run, docs generate
+      - name: dbt build on fixtures, contract-break test, source freshness, late update, key rotation, docs generate
         env:
           DBT_BIN: ${{ github.workspace }}/.venv-dbt/bin/dbt
         run: python -m pytest -m dbt -v
@@ -104,12 +111,26 @@ jobs:
         run: |
           docker run -d --name azurite -p 10000:10000 "$AZURITE_IMAGE" \
             azurite-blob --blobHost 0.0.0.0 --skipApiVersionCheck
-          for i in $(seq 1 30); do (exec 3<>/dev/tcp/127.0.0.1/10000) 2>/dev/null && break || sleep 1; done
+          for _ in $(seq 1 30); do
+            if (exec 3<>/dev/tcp/127.0.0.1/10000) 2>/dev/null; then break; fi
+            sleep 1
+          done
       - name: DagBag test and dag.test() end to end (1,000 patients)
         env:
           DBT_BIN: ${{ github.workspace }}/.venv-dbt/bin/dbt
           AZURITE_CONNECTION_STRING: DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=${{ env.AZURITE_KEY }};BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;
         run: python -m pytest -m airflow -v
+
+  promtool:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check and test the freshness rules with promtool
+        run: |
+          docker run --rm -v "$PWD/observability/rules:/r:ro" --entrypoint promtool \
+            docker.io/prom/prometheus:v2.55.1 check rules /r/freshness.rules.yml
+          docker run --rm -v "$PWD/observability/rules:/r:ro" --entrypoint promtool \
+            docker.io/prom/prometheus:v2.55.1 test rules /r/freshness.rules.test.yml
 
   bicep:
     runs-on: ubuntu-latest

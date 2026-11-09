@@ -23,6 +23,32 @@ dbt lineage (generated from `manifest.json` by `scripts/lineage_svg.py`):
 
 ![dbt lineage](docs/img/lineage.png)
 
+## Verified locally
+
+Each line ran on one laptop on 2026-11-09. Raw output is in `docs/engagement/evidence/`. No GitHub Actions run was started or checked for the new work.
+
+| Claim | Command | Evidence file |
+|---|---|---|
+| Baseline: lint, types, unit, Azurite, dbt and Airflow tests pass before the engagement work | see the file | `docs/engagement/evidence/baseline-local.txt` |
+| dbt contracts on all marts, with a test that a contract break fails the build; source freshness checks; a quarantine-rate gate that stops a run over 5 percent | `.venv/bin/python -m pytest tests/test_contracts_gate.py -v` | `docs/engagement/evidence/contracts-gate.txt` |
+| A provenance manifest for every run (input hashes, code SHA, dbt manifest hash, row counts), checked against a JSON schema | `.venv/bin/python -m pytest tests/test_provenance.py -v` | `docs/engagement/evidence/provenance-manifest-sample.txt` and `.json` |
+| k-anonymity (k=5) at publish: no group under k reaches the curated Parquet file | `.venv/bin/python -m pytest tests/test_kanon.py -q` | `docs/engagement/evidence/kanon-report.txt` |
+| Versioned HMAC keys: a key id in each token, old files readable after a rotation | `.venv/bin/python -m pytest tests/test_key_versions.py -v` | `docs/engagement/evidence/key-versions.txt` |
+| Late-update fix: an update with an old `lastUpdated` is applied, nothing else changes, a re-run is idempotent | `.venv/bin/python -m pytest -m dbt -v` | `docs/engagement/evidence/dbt-tests.txt` and `docs/DECISIONS.md` entry 6 |
+| Pipeline metrics and a 06:00 freshness alert, with rule tests that promtool ran | `podman run ... promtool test rules` (see the file) | `docs/engagement/evidence/promtool-freshness.txt` |
+| Failure lab: corrupt blob, schema drift (new and removed field), late update, Azurite down | `.venv/bin/python scripts/failure_lab.py --all` | `docs/engagement/evidence/failure-lab.txt` |
+| bandit, semgrep, pip-audit, gitleaks and an SBOM pass | commands in `docs/engagement/SECURITY-GATE.md` | `docs/engagement/evidence/security-gate-local.txt` |
+
+## Authored, not run
+
+| File | What it would do | Why it did not run |
+|---|---|---|
+| `.github/workflows/security.yml` and the CodeQL job | Run the security checks on GitHub | Authored, not run: this file is written and syntax-checked with `actionlint 1.7.12`. It was not executed against GitHub Actions. Reason: needs GitHub Actions. |
+| New jobs in `.github/workflows/ci.yml` (promtool, dashboard and map checks) | Run the same checks in CI | Authored, not run: this file is written and syntax-checked with `actionlint 1.7.12`. It was not executed against GitHub Actions. Reason: needs GitHub Actions. |
+| `observability/grafana/fhir-pipeline.json` | Show the five pipeline panels in Grafana | Authored, not run: this file is written and checked with `tools/check_dashboard.py`. It was not loaded into Grafana. Reason: tool not installed. |
+| Alert routing for `FhirMartsLate` and `FhirMartsSloBreach` | Page or ticket on a late run | Authored, not run: the severity labels are written. No Alertmanager was set up. Reason: no cloud account by design. |
+| Key Vault reads for the HMAC keys (Bicep only) | Give the pipeline its keys from a vault | Authored, not run: `infra/main.bicep` is compiled and linted. It was not deployed. Reason: no cloud account by design. |
+
 ## What this is not
 
 - The data is synthetic, from my own generator. It is not Synthea output and not real patient data.
