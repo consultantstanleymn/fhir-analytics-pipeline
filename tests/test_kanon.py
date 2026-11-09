@@ -104,3 +104,138 @@ def test_k_from_env(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setenv("FHIR_K_ANON", "0")
     with pytest.raises(ValueError):
         kanon.get_k()
+
+
+class _FakeStore:
+    """Directory-backed stand-in for BlobStore. Only the calls that publish makes."""
+
+    def __init__(self, root) -> None:
+        self.root = root
+
+    def ensure_container(self, name: str) -> None:
+        (self.root / name).mkdir(parents=True, exist_ok=True)
+
+    def upload_file(self, container: str, blob: str, path) -> None:
+        dest = self.root / container / blob
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(path.read_bytes())
+
+    def upload_bytes(self, container: str, blob: str, data: bytes) -> None:
+        dest = self.root / container / blob
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_bytes(data)
+
+
+def _warehouse(env, patients: int = 120):
+    """Minimal warehouse with the seven marts. Patients are spread over a few small groups."""
+    import duckdb
+
+    from fhir_pipeline import pipeline
+
+    rng = random.Random(11)
+    con = duckdb.connect(str(env / "wh.duckdb"))
+    for schema in ("raw", "staging", "marts"):
+        con.execute(f"create schema {schema}")
+    for name in ("raw_patient", "raw_encounter", "raw_condition", "raw_observation"):
+        con.execute(f"create table raw.{name} (x int)")
+    for name in pipeline.STAGING_MODELS:
+        con.execute(f"create table staging.{name} (x int)")
+    for name in pipeline.MARTS:
+        if name not in ("dim_patient", "mart_condition_prevalence"):
+            con.execute(f"create table marts.{name} (x int)")
+    con.execute(
+        "create table marts.dim_patient (patient_token varchar, mrn_token varchar, gender varchar, "
+        "birth_year integer, birth_decade double, state varchar)"
+    )
+    for i in range(patients):
+        year = rng.randint(1940, 2000)
+        con.execute(
+            "insert into marts.dim_patient values (?, ?, ?, ?, ?, ?)",
+            [f"v1.p{i}", f"v1.m{i}", rng.choice(["female", "male"]), year, year // 10 * 10.0,
+             rng.choice(["MN", "WI", "IA", "ND", "SD", "IL"])],
+        )
+    con.execute(
+        "create table marts.mart_condition_prevalence (condition_code varchar, condition_display varchar, "
+        "patients_with_condition bigint, total_patients bigint, prevalence double)"
+    )
+    con.execute("insert into marts.mart_condition_prevalence values ('A', 'common', 100, 120, 0.8333), "
+                "('B', 'rare', 2, 120, 0.0167)")
+    con.close()
+
+
+def _publish(env, monkeypatch, k: int):
+    from fhir_pipeline import pipeline
+
+    fake = env / "manifest.json"
+    fake.write_text('{"nodes": {}}')
+    monkeypatch.setattr(pipeline, "DBT_MANIFEST", fake)
+    monkeypatch.setenv("FHIR_K_ANON", str(k))
+    store = _FakeStore(env / "blobs")
+    pipeline.publish(store, "2026-05-05", {"run_date": "2026-05-05"}, {})
+    return env / "blobs" / "curated" / "2026-05-05"
+
+
+def test_curated_dim_patient_has_no_group_under_k(env, monkeypatch) -> None:
+    import duckdb
+
+    _warehouse(env)
+    out = _publish(env, monkeypatch, 5)
+    con = duckdb.connect()
+    rows = con.execute(
+        f"select birth_year, state, gender from read_parquet('{out / 'dim_patient.parquet'}')"
+    ).fetchall()
+    assert rows  # not everything was dropped
+    sizes = kanon.group_sizes([dict(zip(QI, r, strict=True)) for r in rows])
+    assert min(sizes.values()) >= 5
+    # the warehouse table still holds exact values for all 120 patients
+    wh = duckdb.connect(str(env / "wh.duckdb"), read_only=True)
+    assert wh.execute("select count(*) from marts.dim_patient").fetchone() == (120,)
+
+
+def test_small_cell_rows_are_hidden_in_prevalence(env, monkeypatch) -> None:
+    import duckdb
+
+    _warehouse(env)
+    out = _publish(env, monkeypatch, 5)
+    rows = duckdb.connect().execute(
+        f"select condition_code, patients_with_condition, prevalence, suppressed "
+        f"from read_parquet('{out / 'mart_condition_prevalence.parquet'}') order by condition_code"
+    ).fetchall()
+    assert rows == [("A", 100, 0.8333, False), ("B", None, None, True)]
+
+
+def test_manifest_contains_kanon_report(env, monkeypatch) -> None:
+    import json
+
+    _warehouse(env)
+    out = _publish(env, monkeypatch, 5)
+    manifest = json.loads((out / "provenance.json").read_text())
+    summary = json.loads((out / "run_summary.json").read_text())
+    report = manifest["kanon"]
+    assert report["k"] == 5 and report["min_group_size"] >= 5
+    assert report["rows_in"] == 120
+    assert report["small_cell_suppressed"] == {"mart_condition_prevalence": 1}
+    assert summary["kanon"] == report
+
+
+@pytest.mark.dbt
+def test_curated_dim_patient_from_fixture_warehouse(env, dbt_bin, monkeypatch) -> None:
+    """Real dbt marts from the readmission fixture. Few patients, so groups under k are dropped."""
+    from pathlib import Path
+
+    import duckdb
+
+    from fhir_pipeline import pipeline
+
+    monkeypatch.setenv("DBT_BIN", dbt_bin)
+    pipeline.ingest_dir(Path(__file__).parent / "fixtures" / "readmission", "2026-01-01")
+    pipeline.dbt_build()
+    store = _FakeStore(env / "blobs")
+    monkeypatch.setenv("FHIR_K_ANON", "3")
+    pipeline.publish(store, "2026-05-06", {"run_date": "2026-05-06"}, {})
+    path = env / "blobs" / "curated" / "2026-05-06" / "dim_patient.parquet"
+    rows = duckdb.connect().execute(
+        f"select birth_year, state, gender from read_parquet('{path}')"
+    ).fetchall()
+    sizes = kanon.group_sizes([dict(zip(QI, r, strict=True)) for r in rows])
+    assert all(n >= 3 for n in sizes.values())

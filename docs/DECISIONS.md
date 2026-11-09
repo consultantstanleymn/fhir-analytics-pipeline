@@ -60,3 +60,10 @@ Each entry gives the choice, the reason, and the cost.
 - Choice: the intermediate model `int_index_stays` reads `fct_encounters`, which is a mart. Layer purists would avoid this.
 - Reason: `fct_encounters` is the deduplicated, incremental fact table. The lineage image shows the back edge.
 - Cost: a full rebuild of the intermediate layer depends on the fact table. The model could move to the marts folder.
+
+## 13. k-anonymity at publish, small cells in one mart
+- Choice: `publish` writes `dim_patient` through a k-anonymity step (k from `FHIR_K_ANON`, default 5) on birth year, state and gender. Steps: birth year to decade, state to census region, then drop the rows still in a group under k.
+- Choice: only `mart_condition_prevalence` gets a small-cell rule. It is the only mart with a count of patients per group (`patients_with_condition`). A row under k shows NULL for count and rate, and a `suppressed` flag.
+- Not changed: `mart_encounters_weekly`, `mart_los` and `mart_readmissions_30d` count encounters or stays, not patients. A patient can have many encounters in one cell, so the encounter count does not map to a patient count. They keep their exact values.
+- Cost: a generalized `birth_year` column is text in the curated file. The dbt table in the warehouse stays unchanged. Dropped rows leave the curated file only.
+- Limit: k-anonymity lowers the risk of re-identification. It does not remove it. It is not a compliance claim.

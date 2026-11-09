@@ -15,6 +15,7 @@ from pathlib import Path
 from typing import Any
 
 from .blob import CURATED, LANDING, BlobStore
+from .kanon import enforce_k, get_k
 from .provenance import build_manifest, git_sha, sha256_bytes
 from .pseudonymize import load_key, pseudonymize
 from .validate import Accepted, validate_line
@@ -208,6 +209,53 @@ STAGING_MODELS = ["stg_patient", "stg_encounter", "stg_condition", "stg_observat
 DBT_MANIFEST = REPO_ROOT / "dbt" / "fhir_analytics" / "target" / "manifest.json"
 
 
+def export_dim_patient_k(con: Any, path: Path, k: int) -> dict[str, Any]:
+    """Write dim_patient to Parquet after k-anonymity. Return the k-anonymity report.
+
+    Groups under k are generalized or suppressed (see `fhir_pipeline.kanon`). No row in a group
+    under k reaches the file. If birth year was generalized, that column is text in the file.
+    """
+    cur = con.execute("SELECT * FROM marts.dim_patient")
+    cols = [d[0] for d in cur.description]
+    rows = [dict(zip(cols, r, strict=True)) for r in cur.fetchall()]
+    out_rows, report = enforce_k(rows, k)
+    types = {"birth_year": "VARCHAR" if "birth_decade" in report["steps_applied"] else "INTEGER",
+             "birth_decade": "DOUBLE"}
+    ddl = ", ".join(f"{c} {types.get(c, 'VARCHAR')}" for c in cols)
+    con.execute("DROP TABLE IF EXISTS _dim_patient_k")
+    con.execute(f"CREATE TEMP TABLE _dim_patient_k ({ddl})")  # nosec B608  # nosemgrep: fhir-no-fstring-sql
+    marks = ", ".join("?" for _ in cols)
+    if out_rows:  # DuckDB rejects an empty parameter list
+        con.executemany(
+            f"INSERT INTO _dim_patient_k VALUES ({marks})",  # nosec B608
+            [[r[c] for c in cols] for r in out_rows],
+        )
+    con.execute(f"COPY (SELECT * FROM _dim_patient_k) TO '{path}' (FORMAT PARQUET)")  # nosec B608  # nosemgrep: fhir-no-fstring-sql
+    con.execute("DROP TABLE _dim_patient_k")
+    return report
+
+
+def export_prevalence_small_cell(con: Any, path: Path, k: int) -> int:
+    """Write mart_condition_prevalence with small cells hidden. Return the number of hidden rows.
+
+    A row with fewer than k patients gets NULL counts and rates, and `suppressed` is true.
+    """
+    k = int(k)  # k is a number here, so it is safe to put in the SQL text
+    sql = (
+        "SELECT condition_code, condition_display, "
+        f"CASE WHEN patients_with_condition < {k} THEN NULL ELSE patients_with_condition END "
+        "AS patients_with_condition, total_patients, "
+        f"CASE WHEN patients_with_condition < {k} THEN NULL ELSE prevalence END AS prevalence, "
+        f"patients_with_condition < {k} AS suppressed "
+        "FROM marts.mart_condition_prevalence"
+    )
+    con.execute(f"COPY ({sql}) TO '{path}' (FORMAT PARQUET)")  # nosec B608  # nosemgrep: fhir-no-fstring-sql
+    row = con.execute(  # nosec B608  # nosemgrep: fhir-no-fstring-sql
+        f"SELECT count(*) FROM marts.mart_condition_prevalence WHERE patients_with_condition < {k}"
+    ).fetchone()
+    return int(row[0]) if row else 0
+
+
 def layer_counts() -> dict[str, dict[str, int]]:
     """Row counts per layer: raw tables, staging views and marts."""
     return {
@@ -231,28 +279,38 @@ def publish(
     out = work_dir() / run_date / "curated"
     out.mkdir(parents=True, exist_ok=True)
     names = []
+    k = get_k()
+    kanon_report: dict[str, Any] = {}
     con = connect()
     try:
         for mart in MARTS:
             if mart not in MARTS:  # allow-list guard for the SQL identifier below
                 raise ValueError(f"unknown mart: {mart}")
             path = out / f"{mart}.parquet"
-            # mart is checked against the MARTS constant; path is built by this code.
-            con.execute(  # nosemgrep: fhir-no-fstring-sql
-                f"COPY (SELECT * FROM marts.{mart}) TO '{path}' (FORMAT PARQUET)"  # nosec B608
-            )
+            if mart == "dim_patient":
+                kanon_report = export_dim_patient_k(con, path, k)
+            elif mart == "mart_condition_prevalence":
+                kanon_report["small_cell_suppressed"] = {
+                    mart: export_prevalence_small_cell(con, path, k)
+                }
+            else:
+                # mart is checked against the MARTS constant; path is built by this code.
+                con.execute(  # nosemgrep: fhir-no-fstring-sql
+                    f"COPY (SELECT * FROM marts.{mart}) TO '{path}' (FORMAT PARQUET)"  # nosec B608
+                )
             blob = f"{run_date}/{mart}.parquet"
             store.upload_file(CURATED, blob, path)
             names.append(blob)
     finally:
         con.close()
     manifest = build_manifest(
-        run_date, dict(inputs or {}), git_sha(), DBT_MANIFEST, layer_counts()
+        run_date, dict(inputs or {}), git_sha(), DBT_MANIFEST, layer_counts(), kanon_report
     )
     blob = f"{run_date}/provenance.json"
     store.upload_bytes(CURATED, blob, json.dumps(manifest, indent=2).encode())
     names.append(blob)
     summary["provenance"] = blob
+    summary["kanon"] = kanon_report
     blob = f"{run_date}/run_summary.json"
     store.upload_bytes(CURATED, blob, json.dumps(summary, indent=2).encode())
     names.append(blob)

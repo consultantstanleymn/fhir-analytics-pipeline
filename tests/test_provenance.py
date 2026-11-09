@@ -97,6 +97,13 @@ def test_publish_uploads_manifest(azurite_conn: str, env: Path, monkeypatch: pyt
         con.execute(f"create table staging.{name} (x int)")
     for name in pipeline.MARTS:
         con.execute(f"create table marts.{name} (x int)")
+    con.execute("drop table marts.dim_patient")
+    con.execute("create table marts.dim_patient (patient_token varchar, mrn_token varchar, "
+                "gender varchar, birth_year integer, birth_decade double, state varchar)")
+    con.execute("drop table marts.mart_condition_prevalence")
+    con.execute("create table marts.mart_condition_prevalence (condition_code varchar, "
+                "condition_display varchar, patients_with_condition bigint, total_patients bigint, "
+                "prevalence double)")
     con.close()
     shutil.rmtree(env / "work", ignore_errors=True)
 
