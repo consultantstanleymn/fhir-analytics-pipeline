@@ -1,0 +1,19 @@
+# Evidence: key versions
+label: VERIFIED LOCALLY
+date: 2026-11-09 11:29 UTC
+code commit: ccff3512b4e0f43ef967d8f2fa72a11b653b4045
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: .venv/bin/python -m pytest tests/test_key_versions.py -v
+notes: Token has key id prefix; new key id gives new token; legacy key maps to v1; old curated Parquet stays readable after a rotation (dbt run on the readmission fixture); tokens do not link across versions.
+---
+tests/test_key_versions.py::test_token_has_kid_prefix PASSED
+tests/test_key_versions.py::test_new_kid_gives_new_token PASSED
+tests/test_key_versions.py::test_same_ring_same_token PASSED
+tests/test_key_versions.py::test_legacy_single_key_env_maps_to_v1 PASSED
+tests/test_key_versions.py::test_keyring_from_env PASSED
+tests/test_key_versions.py::test_missing_active_kid_is_error PASSED
+tests/test_key_versions.py::test_bad_key_id_and_bad_json_are_errors PASSED
+tests/test_key_versions.py::test_old_curated_parquet_still_readable_after_rotation PASSED
+tests/test_key_versions.py::test_tokens_do_not_link_across_versions PASSED
+============================== 9 passed in 17.61s ==============================

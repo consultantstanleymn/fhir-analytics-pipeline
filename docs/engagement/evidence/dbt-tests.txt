@@ -1,0 +1,22 @@
+# Evidence: dbt tests
+label: VERIFIED LOCALLY
+date: 2026-11-09 11:29 UTC
+code commit: ccff3512b4e0f43ef967d8f2fa72a11b653b4045
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: .venv/bin/python -m pytest -q -m dbt
+notes: All dbt-marked tests passed: contract break fails, source freshness runs, late update older than the table maximum is applied, re-run is idempotent, key rotation keeps old files readable.
+---
+dbt-marked tests (names), then the result line of the run:
+tests/test_contracts_gate.py::test_contract_break_fails
+tests/test_contracts_gate.py::test_contract_holds_on_fixture
+tests/test_contracts_gate.py::test_source_freshness_runs
+tests/test_dbt_fixture.py::test_dbt_build_passes_and_readmission_fixture_matches
+tests/test_dbt_fixture.py::test_incremental_rerun_and_update_batch
+tests/test_dbt_fixture.py::test_dbt_docs_generate
+tests/test_dbt_fixture.py::test_late_update_older_than_max_is_applied
+tests/test_dbt_fixture.py::test_incremental_rerun_is_idempotent
+tests/test_kanon.py::test_curated_dim_patient_from_fixture_warehouse
+tests/test_key_versions.py::test_old_curated_parquet_still_readable_after_rotation
+
+================ 10 passed, 96 deselected in 121.42s (0:02:01) =================
