@@ -29,9 +29,13 @@ Each entry gives the choice, the reason, and the cost.
 - Reason: duplicates and late updates are handled in one place, in SQL, and the raw history stays.
 - A load log skips a blob that was loaded before. A second run on the same landing folder adds no rows.
 
-## 6. Incremental `fct_encounters` on `meta.lastUpdated`
-- Choice: `delete+insert` on `encounter_id`. Only rows with `last_updated` above the table maximum are processed.
-- Known gap: an update with a `lastUpdated` older than the current maximum is skipped. A production design would use a lookback window or the load time. The test shows the case that works: a newer update replaces its row, and no other row changes.
+## 6. Incremental `fct_encounters` on the raw load time
+- Choice: `delete+insert` on `encounter_id`. Only rows with a raw load time (`_loaded_at`) above the table maximum of `source_loaded_at` are processed.
+- The first design filtered on `meta.lastUpdated`. An update with a `lastUpdated` older than the table maximum was skipped. That gap is fixed.
+- Why the load time and not a lookback window on `lastUpdated`: a window of N days still misses an update that arrives later than N days. It also rewrites every row in the window on each run, which changes `dbt_loaded_at` for rows that did not change. The load time catches any late arrival and leaves unchanged rows alone.
+- Cost: one extra column, `source_loaded_at`, in `fct_encounters`. An existing warehouse needs `dbt run --full-refresh --select fct_encounters` once, because the model fails on a schema change by design. A re-load of an old blob (a new load time, same content) rewrites its rows with identical values.
+- When two versions of one encounter exist, the staging model keeps the one with the higher `lastUpdated`. A late update with an older `lastUpdated` than the stored version does not replace it.
+- Tests: `test_late_update_older_than_max_is_applied`, `test_incremental_rerun_is_idempotent`, and the update-batch test.
 
 ## 7. Readmission definition
 - Index stay: inpatient (class `IMP`), finished, patient did not die (`dischargeDisposition = exp` excludes).

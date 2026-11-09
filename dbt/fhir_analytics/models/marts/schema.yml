@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: fct_encounters
-    description: One row per encounter. Incremental on meta.lastUpdated.
+    description: One row per encounter. Incremental on the raw load time.
     config:
       contract:
         enforced: true
@@ -48,6 +48,8 @@ models:
       - name: los_days
         data_type: bigint
       - name: last_updated
+        data_type: timestamp
+      - name: source_loaded_at
         data_type: timestamp
       - name: dbt_loaded_at
         data_type: timestamp with time zone

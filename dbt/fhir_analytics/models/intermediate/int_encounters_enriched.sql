@@ -16,6 +16,7 @@ select
     end as los_days,
     p.gender as patient_gender,
     p.birth_year as patient_birth_year,
-    e.last_updated
+    e.last_updated,
+    e.loaded_at
 from {{ ref('stg_encounter') }} as e
 inner join {{ ref('stg_patient') }} as p on e.patient_token = p.patient_token

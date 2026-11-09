@@ -15,5 +15,6 @@ select
     json_extract_string(
         resource, '$.hospitalization.dischargeDisposition.coding[0].code'
     ) as discharge_disposition,
-    {{ to_utc_ts('last_updated') }} as last_updated
+    {{ to_utc_ts('last_updated') }} as last_updated,
+    _loaded_at as loaded_at
 from latest
