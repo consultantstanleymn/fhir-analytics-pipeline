@@ -1,0 +1,21 @@
+# Evidence: quarantine gate holds on re-run (FHR-FIX-1)
+label: VERIFIED LOCALLY
+date: 2026-11-09 12:30 UTC
+code commit: 1f78a9115848f25afe7283cb5b70553bd9306332
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: .venv/bin/python -m pytest -v tests/test_contracts_gate.py -k gate
+notes: A re-run after a gate trip loads 0 rows. Before the fix the gate counted only the new rows and passed. Now the gate counts the stored rows of the run date and stays tripped until the share falls under the limit or release_quarantine_hold is called. Mutation check: with the stored-rows line replaced by a no-op, both new tests failed (2 failed, 1 passed); after restore, 3 passed. The failure lab corrupt-blob case shows the same on Azurite (see failure-lab.txt). Does not prove a run on GitHub Actions.
+---
+tests/test_contracts_gate.py::test_contract_break_fails PASSED           [  9%]
+tests/test_contracts_gate.py::test_contract_holds_on_fixture PASSED      [ 18%]
+tests/test_contracts_gate.py::test_gate_passes_under_limit PASSED        [ 27%]
+tests/test_contracts_gate.py::test_gate_raises_over_limit PASSED         [ 36%]
+tests/test_contracts_gate.py::test_gate_at_exact_limit_passes_and_empty_input_passes PASSED [ 45%]
+tests/test_contracts_gate.py::test_gate_uses_env_limit PASSED            [ 54%]
+tests/test_contracts_gate.py::test_gate_default_limit_is_five_percent PASSED [ 63%]
+tests/test_contracts_gate.py::test_dag_has_gate_task_before_dbt PASSED   [ 72%]
+tests/test_contracts_gate.py::test_source_freshness_runs PASSED          [ 81%]
+tests/test_contracts_gate.py::test_gate_holds_on_rerun_after_trip PASSED [ 90%]
+tests/test_contracts_gate.py::test_gate_hold_clears_when_cause_is_resolved_or_released PASSED [100%]
+============================= 11 passed in 24.62s ==============================

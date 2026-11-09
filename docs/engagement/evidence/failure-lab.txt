@@ -5,7 +5,7 @@ code commit: 0b7dae4fc33bebc43845d8947a6d1c03d9e5521a
 working tree clean at run time: yes
 machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
 command: .venv/bin/python scripts/failure_lab.py --all
-notes: Each case injects one fault into a synthetic run on Azurite and records counts before and after. It does not prove behavior on real Azure storage or with real data.
+notes: The corrupt-blob section was run again at commit 1f78a91 (FHR-FIX-1, adds the gate re-run check); the other sections come from 0b7dae4. Each case injects one fault into a synthetic run on Azurite and records counts before and after. It does not prove behavior on real Azure storage or with real data.
 ---
 
 ## case: corrupt-blob
@@ -21,6 +21,9 @@ day 3: about 33 percent of Observation lines broken. Gate result: quarantine sha
 expect: gate stops the run when the share is too high: PASS
 expect: marts are unchanged after a stopped run: PASS
 expect: nothing is published for the stopped day: PASS
+day 3 re-run (0 rows loaded): quarantine share 0.1377 is above the limit 0.0500 (80 of 581 rows)
+expect: gate still stops the re-run after a trip: PASS
+expect: marts are unchanged after the re-run: PASS
 data effect: bad lines are kept in raw.quarantine with the reason and the raw text. Good lines load.
 
 ## case: schema-drift-new-field
