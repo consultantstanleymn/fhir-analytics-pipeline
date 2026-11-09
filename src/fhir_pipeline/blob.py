@@ -18,11 +18,15 @@ CURATED = "curated"
 
 
 class BlobStore:
-    def __init__(self, connection_string: str | None = None) -> None:
+    def __init__(self, connection_string: str | None = None, retries: int | None = None) -> None:
+        """`retries` sets the SDK retry count. None keeps the SDK default (used in the failure lab)."""
         conn = connection_string or os.environ.get(CONN_ENV)
         if not conn:
             raise RuntimeError(f"{CONN_ENV} is not set.")
-        self._client = BlobServiceClient.from_connection_string(conn)
+        if retries is None:
+            self._client = BlobServiceClient.from_connection_string(conn)
+        else:
+            self._client = BlobServiceClient.from_connection_string(conn, retry_total=retries)
 
     def ensure_container(self, name: str) -> None:
         try:

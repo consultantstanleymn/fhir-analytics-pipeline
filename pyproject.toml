@@ -34,6 +34,9 @@ src = ["src", "generator", "tests", "dags"]
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
 
+[tool.ruff.lint.per-file-ignores]
+"scripts/failure_lab.py" = ["E501"]  # lab output text is easier to read on one line
+
 [tool.mypy]
 python_version = "3.12"
 strict = true
