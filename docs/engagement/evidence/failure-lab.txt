@@ -1,0 +1,72 @@
+# Evidence: failure lab
+label: VERIFIED LOCALLY
+date: 2026-11-09 11:56 UTC
+code commit: 0b7dae4fc33bebc43845d8947a6d1c03d9e5521a
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: .venv/bin/python scripts/failure_lab.py --all
+notes: Each case injects one fault into a synthetic run on Azurite and records counts before and after. It does not prove behavior on real Azure storage or with real data.
+---
+
+## case: corrupt-blob
+before (clean day loaded): {"raw_patient": 100, "raw_encounter": 112, "raw_condition": 103, "raw_observation": 215, "quarantine": 0, "load_log": 4}
+injection: 4 broken lines of 270 Observation lines (cut in half, or binary noise)
+gate: {"rows_in": 638, "quarantined": 4, "share": 0.00627, "max_share": 0.05, "ok": true}
+quarantine reasons: [('malformed JSON: Expecting value', 2), ('malformed JSON: Unterminated string starting at', 2)]
+after: {"raw_patient": 200, "raw_encounter": 250, "raw_condition": 233, "raw_observation": 481, "quarantine": 4, "load_log": 8}
+expect: broken lines go to quarantine: PASS (quarantine +4)
+expect: good lines still load: PASS
+expect: gate passes under the 5 percent limit: PASS
+day 3: about 33 percent of Observation lines broken. Gate result: quarantine share 0.1377 is above the limit 0.0500 (80 of 581 rows)
+expect: gate stops the run when the share is too high: PASS
+expect: marts are unchanged after a stopped run: PASS
+expect: nothing is published for the stopped day: PASS
+data effect: bad lines are kept in raw.quarantine with the reason and the raw text. Good lines load.
+
+## case: schema-drift-new-field
+injection: a new unknown top-level field on 7 of 67 Encounter lines
+before: {"raw_patient": 60, "raw_encounter": 60, "raw_condition": 57, "raw_observation": 112, "quarantine": 0, "load_log": 4}
+after: {"raw_patient": 120, "raw_encounter": 120, "raw_condition": 124, "raw_observation": 237, "quarantine": 7, "load_log": 8}
+quarantine reasons: [('fhir validation: unexpectedNewField', 7)]
+observed: 60 Encounter rows loaded, 7 quarantined; gate share n/a
+dbt build stopped the run. Failing tests: ['relationships_stg_condition_encounter_id__encounter_id__ref_stg_encounter_', 'relationships_stg_observation_encounter_id__encounter_id__ref_stg_encounter_']
+reason: a quarantined Encounter leaves Condition and Observation rows that point to it. The dbt relationship tests catch these orphan references.
+expect: nothing is published when dbt fails: PASS
+data effect: see 'observed'. A strict model rejects unknown fields; the result above shows what this validator does.
+
+## case: schema-drift-removed-field
+injection: the required field 'status' removed on 7 of 67 Encounter lines
+before: {"raw_patient": 60, "raw_encounter": 60, "raw_condition": 57, "raw_observation": 112, "quarantine": 0, "load_log": 4}
+after: {"raw_patient": 120, "raw_encounter": 120, "raw_condition": 124, "raw_observation": 237, "quarantine": 7, "load_log": 8}
+quarantine reasons: [('fhir validation: status', 7)]
+observed: 60 Encounter rows loaded, 7 quarantined; gate share n/a
+expect: changed lines are quarantined: PASS (7 of 7)
+dbt build stopped the run. Failing tests: ['relationships_stg_condition_encounter_id__encounter_id__ref_stg_encounter_', 'relationships_stg_observation_encounter_id__encounter_id__ref_stg_encounter_']
+reason: a quarantined Encounter leaves Condition and Observation rows that point to it. The dbt relationship tests catch these orphan references.
+expect: nothing is published when dbt fails: PASS
+data effect: lines without the required field never reach the warehouse tables. They wait in quarantine.
+
+## case: late-update
+injection: encounter enc-0000001 gets a new version with lastUpdated 2026-03-13 07:00:01 (table maximum is 2026-07-17 02:00:00)
+before: department='Pediatrics'; after: department='Late Arrival Unit'
+rows that changed in the mart: ['enc-0000001']
+gate: {"rows_in": 1, "quarantined": 0, "share": 0.0, "max_share": 0.05, "ok": true}
+expect: late update is applied: PASS
+expect: no other mart row changes: PASS (1 changed)
+data effect: one row replaced. Before the fix this update was skipped (docs/DECISIONS.md entry 6).
+
+## case: azurite-down
+before: loaded and built, publish not run yet. {"raw_patient": 60, "raw_encounter": 56, "raw_condition": 52, "raw_observation": 108, "quarantine": 0, "load_log": 4}
+injection: Azurite stopped before the publish step
+publish error: ServiceRequestError: HTTPConnection(host='127.0.0.1', port=47261): Failed to establish a new connection: [Errno 111] Connection refused
+expect: publish fails with a clear error: PASS
+expect: warehouse is unchanged by the failed publish: PASS
+order in publish: mart files first, then provenance.json, then run_summary.json. A failure before the end leaves no summary.
+after restart: blobs the load log has not seen yet: {}
+expect: re-run loads nothing twice: PASS
+expect: re-run publish completes: PASS
+expect: row counts do not change on the re-run: PASS
+after: {"raw_patient": 60, "raw_encounter": 56, "raw_condition": 52, "raw_observation": 108, "quarantine": 0, "load_log": 4}
+data effect: no duplicate rows. The load log blocks a second load of the same blob.
+
+summary: 5 case(s), 0 failed expectation(s)
