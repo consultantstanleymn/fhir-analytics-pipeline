@@ -1,0 +1,33 @@
+# Evidence: kanon report
+label: VERIFIED LOCALLY
+date: 2026-11-09 08:36 UTC
+code commit: 759911ae92eecdad7fcbe9430388cf2d9fd08a4d
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: scripts/run_dag_test.py --patients 1000 --run-date 2026-02-02 (Azurite running); then read run_summary.json
+notes: k-anonymity report from the 1,000-patient synthetic run: both generalization steps applied, no rows dropped, smallest group 9. Tests in tests/test_kanon.py prove no group under k reaches the curated Parquet.
+---
+1,000-patient DAG run on Azurite (run date 2026-02-02, k from FHIR_K_ANON default 5)
+run_summary.json kanon section:
+{
+  "k": 5,
+  "quasi_identifiers": [
+    "birth_year",
+    "state",
+    "gender"
+  ],
+  "steps_applied": [
+    "birth_decade",
+    "region"
+  ],
+  "rows_in": 1000,
+  "rows_out": 1000,
+  "suppressed_rows": 0,
+  "min_group_size": 9,
+  "groups": 36,
+  "small_cell_suppressed": {
+    "mart_condition_prevalence": 0
+  }
+}
+
+provenance.json kanon section equals the above: True
