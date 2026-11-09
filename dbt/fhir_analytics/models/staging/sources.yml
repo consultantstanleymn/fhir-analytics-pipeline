@@ -4,6 +4,10 @@ sources:
   - name: raw
     schema: raw
     description: Append-only raw tables loaded by the Python pipeline after validation and pseudonymization.
+    loaded_at_field: _loaded_at
+    freshness:
+      warn_after: {count: 26, period: hour}
+      error_after: {count: 50, period: hour}
     tables:
       - name: raw_patient
       - name: raw_encounter

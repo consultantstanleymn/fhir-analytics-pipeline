@@ -44,3 +44,80 @@ def test_contract_holds_on_fixture(env: Path, dbt_bin: str, monkeypatch: pytest.
     pipeline.ingest_dir(FIX / "readmission", "2026-01-01")
     result = pipeline.dbt_build()
     assert result["dbt_nodes"].get("error", 0) == 0
+
+
+def test_gate_passes_under_limit() -> None:
+    loads = [{"rows_in": 100, "rows_quarantined": 3}, {"rows_in": 100, "rows_quarantined": 1}]
+    res = pipeline.check_quarantine_rate(loads, 0.05)
+    assert res["ok"] is True
+    assert res["rows_in"] == 200 and res["quarantined"] == 4
+    assert res["share"] == 0.02
+
+
+def test_gate_raises_over_limit() -> None:
+    loads = [{"rows_in": 100, "rows_quarantined": 6}]
+    with pytest.raises(pipeline.QuarantineGateError, match="above the limit"):
+        pipeline.check_quarantine_rate(loads, 0.05)
+
+
+def test_gate_at_exact_limit_passes_and_empty_input_passes() -> None:
+    assert pipeline.check_quarantine_rate([{"rows_in": 100, "rows_quarantined": 5}], 0.05)["ok"]
+    assert pipeline.check_quarantine_rate([], 0.05)["share"] == 0.0
+    assert pipeline.check_quarantine_rate([{"skipped": True}], 0.05)["ok"]
+
+
+def test_gate_uses_env_limit(monkeypatch: pytest.MonkeyPatch) -> None:
+    loads = [{"rows_in": 100, "rows_quarantined": 10}]
+    monkeypatch.setenv("FHIR_MAX_QUARANTINE_SHARE", "0.2")
+    assert pipeline.check_quarantine_rate(loads)["max_share"] == 0.2
+    monkeypatch.setenv("FHIR_MAX_QUARANTINE_SHARE", "0.01")
+    with pytest.raises(pipeline.QuarantineGateError):
+        pipeline.check_quarantine_rate(loads)
+
+
+def test_gate_default_limit_is_five_percent(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.delenv("FHIR_MAX_QUARANTINE_SHARE", raising=False)
+    assert pipeline.check_quarantine_rate([{"rows_in": 100, "rows_quarantined": 1}])["max_share"] == 0.05
+
+
+GATE_SCRIPT = """
+import json, sys
+from airflow.dag_processing.dagbag import DagBag
+dag = DagBag(dag_folder=sys.argv[1]).dags["fhir_daily"]
+print("RESULT=" + json.dumps({
+    "dbt_upstream": sorted(dag.get_task("dbt_build_task").upstream_task_ids),
+    "tasks": sorted(dag.task_ids),
+}))
+"""
+
+
+@pytest.mark.airflow
+def test_dag_has_gate_task_before_dbt(tmp_path: Path) -> None:
+    import json
+    import os
+    import subprocess
+    import sys
+
+    dags = str(pipeline.REPO_ROOT / "dags")
+    env = {**os.environ, "AIRFLOW_HOME": str(tmp_path), "AIRFLOW__CORE__LOAD_EXAMPLES": "False",
+           "AIRFLOW__CORE__DAGS_FOLDER": dags}
+    proc = subprocess.run([sys.executable, "-c", GATE_SCRIPT, dags], env=env,
+                          capture_output=True, text=True, check=True)
+    line = next(x for x in proc.stdout.splitlines() if x.startswith("RESULT="))
+    result = json.loads(line.removeprefix("RESULT="))
+    assert "quarantine_gate" in result["dbt_upstream"]
+    assert "source_freshness" in result["tasks"]
+
+
+@pytest.mark.dbt
+def test_source_freshness_runs(env: Path, dbt_bin: str, monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("DBT_BIN", dbt_bin)
+    pipeline.ingest_dir(FIX / "readmission", "2026-01-01")
+    res = pipeline.dbt_source_freshness()
+    assert set(res["sources"]) == {"raw_patient", "raw_encounter", "raw_condition", "raw_observation"}
+    # The readmission fixture loads Patient and Encounter only. Loaded tables are fresh.
+    assert res["sources"]["raw_patient"] == "pass"
+    assert res["sources"]["raw_encounter"] == "pass"
+    # An empty source table has no load time, so dbt reports it as an error.
+    assert res["sources"]["raw_condition"] == "error"
+    assert res["ok"] is False

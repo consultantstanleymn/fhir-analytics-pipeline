@@ -30,6 +30,12 @@ MARTS = [
     "mart_condition_prevalence",
 ]
 REPO_ROOT = Path(__file__).resolve().parents[2]
+MAX_QUARANTINE_ENV = "FHIR_MAX_QUARANTINE_SHARE"
+DEFAULT_MAX_QUARANTINE_SHARE = 0.05
+
+
+class QuarantineGateError(RuntimeError):
+    """Raised when the rejected share of input rows passes the set limit."""
 
 
 def work_dir() -> Path:
@@ -155,6 +161,44 @@ def dbt_build() -> dict[str, Any]:
         tail = "\n".join((proc.stdout or "").splitlines()[-30:])
         raise RuntimeError(f"dbt build failed ({counts}):\n{tail}")
     return {"dbt_nodes": counts}
+
+
+def check_quarantine_rate(loads: list[dict[str, Any]], max_share: float | None = None) -> dict[str, Any]:
+    """Quarantine-rate gate. Fails the run when rejected rows pass `max_share` of all input rows.
+
+    Each item in `loads` needs `rows_in` and `rows_quarantined` (missing keys count as 0, so a
+    skipped resource adds nothing). The limit comes from FHIR_MAX_QUARANTINE_SHARE (default 0.05).
+    """
+    if max_share is None:
+        max_share = float(os.environ.get(MAX_QUARANTINE_ENV, DEFAULT_MAX_QUARANTINE_SHARE))
+    rows_in = sum(int(x.get("rows_in", 0)) for x in loads)
+    quarantined = sum(int(x.get("rows_quarantined", 0)) for x in loads)
+    share = quarantined / rows_in if rows_in else 0.0
+    result = {"rows_in": rows_in, "quarantined": quarantined, "share": round(share, 6),
+              "max_share": max_share, "ok": share <= max_share}
+    if not result["ok"]:
+        raise QuarantineGateError(
+            f"quarantine share {share:.4f} is above the limit {max_share:.4f} "
+            f"({quarantined} of {rows_in} rows)"
+        )
+    return result
+
+
+def dbt_source_freshness() -> dict[str, Any]:
+    """Run `dbt source freshness` and return the status of each source table.
+
+    Status values are dbt's: pass, warn, error. An error status is not raised here;
+    the caller decides. A failed dbt call (no results file) raises RuntimeError.
+    """
+    target = REPO_ROOT / "dbt" / "fhir_analytics" / "target" / "sources.json"
+    target.unlink(missing_ok=True)
+    proc = run_dbt(["source", "freshness"])
+    if not target.exists():
+        tail = "\n".join((proc.stdout or "").splitlines()[-20:])
+        raise RuntimeError(f"dbt source freshness produced no result:\n{tail}")
+    results = json.loads(target.read_text())["results"]
+    sources = {r["unique_id"].split(".")[-1]: r["status"] for r in results}
+    return {"sources": sources, "ok": all(v != "error" for v in sources.values())}
 
 
 def publish(store: BlobStore, run_date: str, summary: dict[str, Any]) -> list[str]:

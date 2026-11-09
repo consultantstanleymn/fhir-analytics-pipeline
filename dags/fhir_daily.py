@@ -75,14 +75,30 @@ with DAG(
         first >> second
 
     @task
-    def dbt_build_task(loads: list[dict[str, Any]]) -> dict[str, Any]:
+    def quarantine_gate(loads: list[dict[str, Any]]) -> dict[str, Any]:
+        from fhir_pipeline.pipeline import check_quarantine_rate
+
+        return check_quarantine_rate(loads)
+
+    @task
+    def source_freshness(loads: list[dict[str, Any]]) -> dict[str, Any]:
+        from fhir_pipeline.pipeline import dbt_source_freshness
+
+        return dbt_source_freshness()
+
+    @task
+    def dbt_build_task(loads: list[dict[str, Any]], gate: dict[str, Any]) -> dict[str, Any]:
         from fhir_pipeline.pipeline import dbt_build
 
         return dbt_build()
 
     @task
     def publish_task(
-        loads: list[dict[str, Any]], dbt_result: dict[str, Any], params: dict[str, Any]
+        loads: list[dict[str, Any]],
+        dbt_result: dict[str, Any],
+        gate: dict[str, Any],
+        freshness: dict[str, Any],
+        params: dict[str, Any],
     ) -> dict[str, Any]:
         from fhir_pipeline.blob import BlobStore
         from fhir_pipeline.pipeline import publish, quarantine_count, table_count
@@ -99,6 +115,8 @@ with DAG(
             },
             "quarantine_total": quarantine_count(),
             "dbt": dbt_result["dbt_nodes"],
+            "quarantine_gate": gate,
+            "source_freshness": freshness,
             "mart_rows": {
                 m: table_count(f"marts.{m}")
                 for m in ("fct_encounters", "dim_patient", "mart_readmissions_30d", "mart_los")
@@ -108,5 +126,7 @@ with DAG(
         return summary
 
     load_results = [g.result for g in groups]
-    built = dbt_build_task(load_results)
-    publish_task(load_results, built)
+    gate = quarantine_gate(load_results)
+    fresh = source_freshness(load_results)
+    built = dbt_build_task(load_results, gate)
+    publish_task(load_results, built, gate, fresh)
