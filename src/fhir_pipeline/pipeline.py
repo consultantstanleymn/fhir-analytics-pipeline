@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -164,8 +165,13 @@ def publish(store: BlobStore, run_date: str, summary: dict[str, Any]) -> list[st
     con = connect()
     try:
         for mart in MARTS:
+            if mart not in MARTS:  # allow-list guard for the SQL identifier below
+                raise ValueError(f"unknown mart: {mart}")
             path = out / f"{mart}.parquet"
-            con.execute(f"COPY (SELECT * FROM marts.{mart}) TO '{path}' (FORMAT PARQUET)")
+            # mart is checked against the MARTS constant; path is built by this code.
+            con.execute(  # nosemgrep: fhir-no-fstring-sql
+                f"COPY (SELECT * FROM marts.{mart}) TO '{path}' (FORMAT PARQUET)"  # nosec B608
+            )
             blob = f"{run_date}/{mart}.parquet"
             store.upload_file(CURATED, blob, path)
             names.append(blob)
@@ -177,10 +183,17 @@ def publish(store: BlobStore, run_date: str, summary: dict[str, Any]) -> list[st
     return names
 
 
+_TABLE_RE = re.compile(r"^(raw|marts)\.[a-z_0-9]+$")
+
+
 def table_count(table: str) -> int:
+    if not _TABLE_RE.fullmatch(table):  # allow-list guard for the SQL identifier below
+        raise ValueError(f"unsafe table name: {table}")
     con = connect()
     try:
-        row = con.execute(f"SELECT count(*) FROM {table}").fetchone()
+        row = con.execute(  # nosemgrep: fhir-no-fstring-sql
+            f"SELECT count(*) FROM {table}"  # nosec B608
+        ).fetchone()
         return int(row[0]) if row else 0
     finally:
         con.close()

@@ -35,8 +35,8 @@ def connect(path: Path | None = None) -> duckdb.DuckDBPyConnection:
 
 def init_schema(con: duckdb.DuckDBPyConnection) -> None:
     con.execute("CREATE SCHEMA IF NOT EXISTS raw")
-    for table in RAW_TABLES.values():
-        con.execute(
+    for table in RAW_TABLES.values():  # table names come from the fixed RAW_TABLES map
+        con.execute(  # nosemgrep: fhir-no-fstring-sql
             f"""CREATE TABLE IF NOT EXISTS raw.{table} (
                 resource_id VARCHAR,
                 last_updated VARCHAR,
@@ -93,7 +93,10 @@ def load_resources(
     con.execute("BEGIN")
     try:
         if good:
-            con.executemany(f"INSERT INTO raw.{table} VALUES (?, ?, ?, ?, ?)", good)
+            # Table name comes from the fixed RAW_TABLES map above, never from input.
+            con.executemany(  # nosemgrep: fhir-no-fstring-sql
+                f"INSERT INTO raw.{table} VALUES (?, ?, ?, ?, ?)", good  # nosec B608
+            )
         if bad:
             con.executemany("INSERT INTO raw.quarantine VALUES (?, ?, ?, ?, ?)", bad)
         con.execute(

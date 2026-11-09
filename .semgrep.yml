@@ -1,0 +1,22 @@
+rules:
+  - id: fhir-no-fstring-sql
+    languages: [python]
+    severity: ERROR
+    message: >-
+      Do not build SQL with an f-string. Use query parameters. If the value is an
+      identifier from a fixed allow-list, add a nosemgrep comment that names the guard.
+    pattern-either:
+      - pattern: $CON.execute(f"...", ...)
+      - pattern: $CON.executemany(f"...", ...)
+  - id: fhir-no-unsafe-yaml-load
+    languages: [python]
+    severity: ERROR
+    message: Use yaml.safe_load. Do not call yaml.load without SafeLoader.
+    patterns:
+      - pattern: yaml.load(...)
+      - pattern-not: yaml.load(..., Loader=yaml.SafeLoader)
+  - id: fhir-no-shell-true
+    languages: [python]
+    severity: ERROR
+    message: Do not run subprocess with shell=True.
+    pattern: subprocess.$FUNC(..., shell=True, ...)
