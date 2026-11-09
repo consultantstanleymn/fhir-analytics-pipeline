@@ -117,6 +117,14 @@ def test_dag_end_to_end_1000_patients(azurite_conn, dbt_bin, tmp_path):
     assert manifest["row_counts"]["raw"]["raw_patient"] == patients["loaded"]
     assert summary["provenance"] == "2026-02-02/provenance.json"
 
+    # The metrics textfile has the pipeline series for this run.
+    prom = Path(os.environ["FHIR_METRICS_FILE"]).read_text()
+    assert 'fhir_task_duration_seconds{task="dbt_build"}' in prom
+    assert 'fhir_task_duration_seconds{task="publish"}' in prom
+    assert 'fhir_rows_total{layer="raw",resource="Patient"}' in prom
+    assert "fhir_run_success 1.0" in prom
+    assert "fhir_marts_published_timestamp_seconds 1." in prom
+
     # No direct identifier reached the warehouse.
     leaked = wh.execute(
         "select count(*) from raw.raw_patient where resource::varchar ilike '%Example Street%' "

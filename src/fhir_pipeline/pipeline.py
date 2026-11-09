@@ -14,6 +14,7 @@ import sys
 from pathlib import Path
 from typing import Any
 
+from . import metrics
 from .blob import CURATED, LANDING, BlobStore
 from .kanon import enforce_k, get_k
 from .provenance import build_manifest, git_sha, sha256_bytes
@@ -167,6 +168,14 @@ def dbt_build() -> dict[str, Any]:
     return {"dbt_nodes": counts}
 
 
+def _safe_metric(fn: Any, *args: Any) -> None:
+    """Metrics never stop a run. A write error (disk, permission) is ignored."""
+    try:
+        fn(*args)
+    except (OSError, ValueError):
+        pass
+
+
 def check_quarantine_rate(loads: list[dict[str, Any]], max_share: float | None = None) -> dict[str, Any]:
     """Quarantine-rate gate. Fails the run when rejected rows pass `max_share` of all input rows.
 
@@ -180,6 +189,7 @@ def check_quarantine_rate(loads: list[dict[str, Any]], max_share: float | None =
     share = quarantined / rows_in if rows_in else 0.0
     result = {"rows_in": rows_in, "quarantined": quarantined, "share": round(share, 6),
               "max_share": max_share, "ok": share <= max_share}
+    _safe_metric(metrics.record_quarantine_share, share)
     if not result["ok"]:
         raise QuarantineGateError(
             f"quarantine share {share:.4f} is above the limit {max_share:.4f} "
@@ -265,6 +275,26 @@ def layer_counts() -> dict[str, dict[str, int]]:
     }
 
 
+RAW_RESOURCE = {"raw_patient": "Patient", "raw_encounter": "Encounter",
+                "raw_condition": "Condition", "raw_observation": "Observation"}
+STAGING_RESOURCE = {"stg_patient": "Patient", "stg_encounter": "Encounter",
+                    "stg_condition": "Condition", "stg_observation": "Observation"}
+
+
+def _record_publish_metrics(counts: dict[str, dict[str, int]]) -> None:
+    """Row counts per layer, publish time and success flag. Writes the textfile."""
+    for table, n in counts["raw"].items():
+        if table in RAW_RESOURCE:
+            _safe_metric(metrics.record_rows, "raw", RAW_RESOURCE[table], n)
+    for table, n in counts["staging"].items():
+        if table in STAGING_RESOURCE:
+            _safe_metric(metrics.record_rows, "staging", STAGING_RESOURCE[table], n)
+    _safe_metric(metrics.record_rows, "marts", "all", sum(counts["marts"].values()))
+    _safe_metric(metrics.mark_published)
+    _safe_metric(metrics.set_run_success, True)
+    _safe_metric(metrics.write)
+
+
 def publish(
     store: BlobStore,
     run_date: str,
@@ -311,6 +341,7 @@ def publish(
     names.append(blob)
     summary["provenance"] = blob
     summary["kanon"] = kanon_report
+    _record_publish_metrics(manifest["row_counts"])
     blob = f"{run_date}/run_summary.json"
     store.upload_bytes(CURATED, blob, json.dumps(summary, indent=2).encode())
     names.append(blob)

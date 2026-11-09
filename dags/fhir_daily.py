@@ -21,6 +21,17 @@ from airflow.sdk import DAG, Param, TaskGroup, task
 RESOURCE_ORDER = ("Patient", "Encounter", "Condition", "Observation")
 
 
+def _task_failed(context: dict[str, Any]) -> None:
+    """Failure callback: write run_success 0 to the metrics textfile."""
+    from fhir_pipeline import metrics
+
+    try:
+        metrics.set_run_success(False)
+        metrics.write()
+    except (OSError, ValueError):
+        pass  # metrics must never hide the real task error
+
+
 def _run_date(params: dict[str, Any]) -> str:
     return str(params.get("run_date") or date.today().isoformat())
 
@@ -34,14 +45,17 @@ with DAG(
     max_active_runs=1,
     params={"run_date": Param(None, type=["null", "string"], description="YYYY-MM-DD folder")},
     tags=["fhir", "analytics"],
+    default_args={"on_failure_callback": _task_failed},
 ) as dag:
 
     @task
     def list_new_blobs(params: dict[str, Any]) -> dict[str, str]:
         from fhir_pipeline.blob import BlobStore
+        from fhir_pipeline.metrics import timed
         from fhir_pipeline.pipeline import list_new_blobs as _list
 
-        return _list(BlobStore(), _run_date(params))
+        with timed("list_new_blobs"):
+            return _list(BlobStore(), _run_date(params))
 
     listing = list_new_blobs()
 
@@ -51,20 +65,24 @@ with DAG(
             @task(task_id="validate")
             def validate(found: dict[str, str], params: dict[str, Any]) -> dict[str, Any]:
                 from fhir_pipeline.blob import BlobStore
+                from fhir_pipeline.metrics import timed
                 from fhir_pipeline.pipeline import validate_blob
 
                 if rtype not in found:
                     return {"resource_type": rtype, "rows_in": 0, "valid": 0, "rejected": 0,
                             "skipped": True}
-                return validate_blob(BlobStore(), _run_date(params), rtype)
+                with timed("validate"):
+                    return validate_blob(BlobStore(), _run_date(params), rtype)
 
             @task(task_id="load")
             def load(stats: dict[str, Any], params: dict[str, Any]) -> dict[str, Any]:
+                from fhir_pipeline.metrics import timed
                 from fhir_pipeline.pipeline import load_blob
 
                 if stats.get("skipped"):
                     return stats
-                return {**stats, **load_blob(_run_date(params), rtype, stats["rows_in"])}
+                with timed("load"):
+                    return {**stats, **load_blob(_run_date(params), rtype, stats["rows_in"])}
 
             result = load(validate(listing))
         group.result = result  # type: ignore[attr-defined]
@@ -76,21 +94,27 @@ with DAG(
 
     @task
     def quarantine_gate(loads: list[dict[str, Any]]) -> dict[str, Any]:
+        from fhir_pipeline.metrics import timed
         from fhir_pipeline.pipeline import check_quarantine_rate
 
-        return check_quarantine_rate(loads)
+        with timed("quarantine_gate"):
+            return check_quarantine_rate(loads)
 
     @task
     def source_freshness(loads: list[dict[str, Any]]) -> dict[str, Any]:
+        from fhir_pipeline.metrics import timed
         from fhir_pipeline.pipeline import dbt_source_freshness
 
-        return dbt_source_freshness()
+        with timed("source_freshness"):
+            return dbt_source_freshness()
 
     @task
     def dbt_build_task(loads: list[dict[str, Any]], gate: dict[str, Any]) -> dict[str, Any]:
+        from fhir_pipeline.metrics import timed
         from fhir_pipeline.pipeline import dbt_build
 
-        return dbt_build()
+        with timed("dbt_build"):
+            return dbt_build()
 
     @task
     def publish_task(
@@ -129,7 +153,13 @@ with DAG(
             for x in loads
             if x.get("input_sha256")
         }
-        summary["published"] = publish(BlobStore(), summary["run_date"], summary, inputs)
+        from fhir_pipeline.metrics import timed
+
+        with timed("publish"):
+            summary["published"] = publish(BlobStore(), summary["run_date"], summary, inputs)
+        from fhir_pipeline import metrics
+
+        metrics.write()  # include the publish duration
         return summary
 
     load_results = [g.result for g in groups]

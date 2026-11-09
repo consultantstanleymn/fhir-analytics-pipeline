@@ -67,6 +67,12 @@ def azurite_conn() -> Iterator[str]:
         subprocess.run(["podman", "rm", "-f", name], check=False, capture_output=True)
 
 
+@pytest.fixture(autouse=True)
+def _metrics_file(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep metrics textfiles out of the repo during tests."""
+    monkeypatch.setenv("FHIR_METRICS_FILE", str(tmp_path / "metrics" / "fhir_pipeline.prom"))
+
+
 @pytest.fixture
 def env(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     """Isolated warehouse file, work dir and test HMAC key."""
