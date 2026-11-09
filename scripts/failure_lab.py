@@ -221,11 +221,14 @@ def _drift_case(root: Path, label: str, mutate: Callable[[dict[str, Any]], dict[
         changed += 1
     upload(store, "2026-03-02", day2, root)
     gate_stop = None
+    dbt_fail = None
     res: dict[str, Any] = {"gate": {"share": "n/a"}}
     try:
         res = run_day(store, "2026-03-02")
     except QuarantineGateError as exc:
         gate_stop = str(exc)
+    except RuntimeError as exc:  # dbt build failed: a dbt test caught a problem
+        dbt_fail = str(exc)
     after = counts(root)
     rejected = after["quarantine"] - before["quarantine"]
     loaded = after["raw_encounter"] - before["raw_encounter"]
@@ -238,9 +241,17 @@ def _drift_case(root: Path, label: str, mutate: Callable[[dict[str, Any]], dict[
         expect("changed lines are quarantined", rejected == changed, f"{rejected} of {changed}")
     elif expect_rejected is False:
         expect("changed lines are accepted", rejected == 0, f"{rejected} rejected")
+    published = any(n == "provenance.json" for n in curated(store, "2026-03-02"))
     if gate_stop:
         say(f"gate stopped the run: {gate_stop}")
-    expect("run ends with marts published", any(n == "provenance.json" for n in curated(store, "2026-03-02")))
+    if dbt_fail:
+        tests = sorted(set(re.findall(r"in test (\S+)", dbt_fail)))
+        say(f"dbt build stopped the run. Failing tests: {tests}")
+        say("reason: a quarantined Encounter leaves Condition and Observation rows that point to it. "
+            "The dbt relationship tests catch these orphan references.")
+        expect("nothing is published when dbt fails", not published)
+    elif not gate_stop:
+        expect("run ends with marts published", published)
 
 
 def case_new_field(root: Path) -> None:
