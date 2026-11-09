@@ -1,0 +1,62 @@
+# Evidence: security gate local
+label: PARTLY RUN
+date: 2026-11-09 07:00 UTC
+code commit: a07905158027a1c9fc242c6bb596523e7b528ace
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: see each === line below (run from the repo root)
+notes: bandit, semgrep, pip-audit, gitleaks, exceptions check and actionlint ran locally. The workflow itself and CodeQL did not run (needs GitHub Actions).
+---
+=== $TV/bin/bandit -r src generator dags -ll
+Run metrics:
+	Total issues (by severity):
+		Undefined: 0
+		Low: 4
+		Medium: 0
+		High: 0
+	Total issues (by confidence):
+		Undefined: 0
+		Low: 0
+		Medium: 0
+		High: 4
+Files skipped (0):
+exit 0
+=== $TV/bin/semgrep --config .semgrep.yml --metrics=off --error src generator dags
+│ Scan Summary │
+└──────────────┘
+✅ Scan completed successfully.
+ • Findings: 0 (0 blocking)
+ • Rules run: 3
+ • Targets scanned: 9
+ • Parsed lines: ~100.0%
+ • Scan was limited to files tracked by git
+ • For a detailed list of skipped files and lines, run semgrep with the --verbose flag
+Ran 3 rules on 9 files: 0 findings.
+If Semgrep missed a finding, please send us feedback to let us know!
+See https://semgrep.dev/docs/reporting-false-negatives/
+exit 0
+=== $TV/bin/pip-audit -r requirements/app.lock --no-deps --disable-pip
+WARNING:pip_audit._cli:--no-deps is supported, but users are encouraged to fully hash their pinned dependencies
+WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes
+No known vulnerabilities found
+exit 0
+=== $TV/bin/pip-audit -r requirements/dbt.lock --no-deps --disable-pip
+WARNING:pip_audit._cli:--no-deps is supported, but users are encouraged to fully hash their pinned dependencies
+WARNING:pip_audit._cli:Consider using a tool like `pip-compile`: https://pip-tools.readthedocs.io/en/latest/#using-hashes
+No known vulnerabilities found
+exit 0
+=== gitleaks git --config .gitleaks.toml --redact --no-banner --exit-code 1 .
+2:00AM INF 9 commits scanned.
+2:00AM INF scanned ~183548 bytes (183.55 KB) in 210ms
+2:00AM INF no leaks found
+exit 0
+=== gitleaks dir --config .gitleaks.toml --redact --no-banner .
+2:00AM INF scanned ~430687 bytes (430.69 KB) in 210ms
+2:00AM INF no leaks found
+exit 0
+=== python3 scripts/check_security_exceptions.py security/exceptions.json
+exceptions ok
+exit 0
+=== actionlint .github/workflows/security.yml
+exit 0
+=== trivy SBOM: 216 library components from app.lock and dbt.lock, file sbom-source.cdx.json
