@@ -17,7 +17,7 @@ from typing import Any
 from .blob import CURATED, LANDING, BlobStore
 from .kanon import enforce_k, get_k
 from .provenance import build_manifest, git_sha, sha256_bytes
-from .pseudonymize import load_key, pseudonymize
+from .pseudonymize import load_keyring, pseudonymize
 from .validate import Accepted, validate_line
 from .warehouse import RAW_TABLES, already_loaded, connect, init_schema, load_resources
 
@@ -87,7 +87,7 @@ def validate_blob(store: BlobStore, run_date: str, rtype: str) -> dict[str, Any]
 
 def validate_text(run_date: str, rtype: str, data: str) -> dict[str, Any]:
     """Validate NDJSON text; write valid (pseudonymized) and rejected rows to the work dir."""
-    key = load_key()
+    keyring = load_keyring()
     out = work_dir() / run_date
     out.mkdir(parents=True, exist_ok=True)
     rows_in = valid = 0
@@ -99,7 +99,7 @@ def validate_text(run_date: str, rtype: str, data: str) -> dict[str, Any]:
             rows_in += 1
             result = validate_line(rtype, line)
             if isinstance(result, Accepted):
-                ok.write(json.dumps(pseudonymize(result.resource, key)) + "\n")
+                ok.write(json.dumps(pseudonymize(result.resource, keyring)) + "\n")
                 valid += 1
             else:
                 bad.write(json.dumps({"reason": result.reason, "raw_line": result.raw_line}) + "\n")
