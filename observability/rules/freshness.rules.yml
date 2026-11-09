@@ -1,0 +1,41 @@
+# Freshness SLO for the daily marts.
+# Goal: the marts are published by 06:00 UTC. All times in these rules are UTC.
+# The pipeline writes fhir_marts_published_timestamp_seconds at the end of each publish.
+groups:
+  - name: fhir-freshness
+    interval: 1m
+    rules:
+      # Daily good (1) or bad (0) sample. It exists only in the hour 06:00 to 06:59 UTC.
+      # Good means: the last publish happened today, and not later than 06:00 UTC today.
+      - record: fhir:marts_on_time:daily
+        expr: |
+          (
+            (fhir_marts_published_timestamp_seconds >= bool (time() - time() % 86400))
+            *
+            (fhir_marts_published_timestamp_seconds <= bool (time() - time() % 86400 + 21600))
+          ) and on() (hour() == 6)
+
+      # Share of on-time days over 28 days. Each day gives the same number of samples.
+      - record: fhir:marts_on_time:ratio_28d
+        expr: avg_over_time(fhir:marts_on_time:daily[28d])
+
+      # No publish yet today, and it is 06:00 UTC or later.
+      - alert: FhirMartsLate
+        expr: |
+          fhir_marts_published_timestamp_seconds < (time() - time() % 86400)
+          and on() hour() >= 6
+        for: 5m
+        labels:
+          severity: page
+        annotations:
+          summary: "The marts were not published by 06:00 UTC"
+          description: "Last publish was more than a day ago, and it is past 06:00 UTC."
+
+      # The SLO is 96.4 percent of days over 28 days. That allows 1 late day in 28.
+      - alert: FhirMartsSloBreach
+        expr: fhir:marts_on_time:ratio_28d < 0.964
+        for: 1h
+        labels:
+          severity: ticket
+        annotations:
+          summary: "Fewer than 96.4 percent of days were on time in the last 28 days"

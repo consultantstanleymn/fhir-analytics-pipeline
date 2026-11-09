@@ -1,0 +1,110 @@
+# Unit tests for freshness.rules.yml. Run with promtool (see docs/engagement/OBSERVABILITY.md).
+# Time zero is 1970-01-01 00:00 UTC. Day 2 starts at 172800 seconds.
+rule_files:
+  - freshness.rules.yml
+
+evaluation_interval: 1m
+
+tests:
+  # Late day: the last publish is from day 1. At 06:20 on day 2 the alert is pending, at 07:00 it fires.
+  - interval: 1m
+    input_series:
+      - series: 'fhir_marts_published_timestamp_seconds'
+        values: '100000x4000'
+    alert_rule_test:
+      - eval_time: 2d6h2m
+        alertname: FhirMartsLate
+        exp_alerts: []
+      - eval_time: 2d7h
+        alertname: FhirMartsLate
+        exp_alerts:
+          - exp_labels:
+              severity: page
+            exp_annotations:
+              summary: "The marts were not published by 06:00 UTC"
+              description: "Last publish was more than a day ago, and it is past 06:00 UTC."
+    promql_expr_test:
+      - expr: fhir:marts_on_time:daily
+        eval_time: 2d6h30m
+        exp_samples:
+          - labels: 'fhir:marts_on_time:daily'
+            value: 0
+
+  # On-time day: the publish was at 03:00 on day 2. No alert at 07:00. The daily sample is 1.
+  - interval: 1m
+    input_series:
+      - series: 'fhir_marts_published_timestamp_seconds'
+        values: '183600x4000'
+    alert_rule_test:
+      - eval_time: 2d7h
+        alertname: FhirMartsLate
+        exp_alerts: []
+    promql_expr_test:
+      - expr: fhir:marts_on_time:daily
+        eval_time: 2d6h30m
+        exp_samples:
+          - labels: 'fhir:marts_on_time:daily'
+            value: 1
+      - expr: fhir:marts_on_time:daily
+        eval_time: 2d7h30m
+        exp_samples: []
+
+  # Publish at 06:30 is late. The alert fires at 06:20 (no publish yet), and the daily sample is 0.
+  - interval: 1m
+    input_series:
+      - series: 'fhir_marts_published_timestamp_seconds'
+        values: '100000x3269 196200x700'
+    alert_rule_test:
+      - eval_time: 2d6h20m
+        alertname: FhirMartsLate
+        exp_alerts:
+          - exp_labels:
+              severity: page
+            exp_annotations:
+              summary: "The marts were not published by 06:00 UTC"
+              description: "Last publish was more than a day ago, and it is past 06:00 UTC."
+      - eval_time: 2d7h
+        alertname: FhirMartsLate
+        exp_alerts: []
+    promql_expr_test:
+      - expr: fhir:marts_on_time:daily
+        eval_time: 2d6h45m
+        exp_samples:
+          - labels: 'fhir:marts_on_time:daily'
+            value: 0
+
+  # one late day in 28 (inside the budget)
+  - interval: 1m
+    input_series:
+      - series: 'fhir_marts_published_timestamp_seconds'
+        values: '100000x179 10800x1439 97200x1439 183600x1439 270000x1439 356400x1439 442800x1439 529200x1439 615600x1439 702000x1439 788400x1679 889200x1199 961200x1439 1047600x1439 1134000x1439 1220400x1439 1306800x1439 1393200x1439 1479600x1439 1566000x1439 1652400x1439 1738800x1439 1825200x1439 1911600x1439 1998000x1439 2084400x1439 2170800x1439 2257200x1439 2343600x1439 2430000x1264'
+    promql_expr_test:
+      - expr: round(fhir:marts_on_time:ratio_28d, 0.001)
+        eval_time: 28d6h59m
+        exp_samples:
+          - labels: '{}'
+            value: 0.964
+    alert_rule_test:
+      - eval_time: 28d8h5m
+        alertname: FhirMartsSloBreach
+        exp_alerts: []
+
+  # two late days in 28 (budget used up)
+  - interval: 1m
+    input_series:
+      - series: 'fhir_marts_published_timestamp_seconds'
+        values: '100000x179 10800x1439 97200x1439 183600x1439 270000x1439 356400x1439 442800x1439 529200x1439 615600x1439 702000x1439 788400x1679 889200x1199 961200x1439 1047600x1439 1134000x1439 1220400x1439 1306800x1439 1393200x1439 1479600x1439 1566000x1439 1652400x1679 1753200x1199 1825200x1439 1911600x1439 1998000x1439 2084400x1439 2170800x1439 2257200x1439 2343600x1439 2430000x1264'
+    promql_expr_test:
+      - expr: round(fhir:marts_on_time:ratio_28d, 0.001)
+        eval_time: 28d6h59m
+        exp_samples:
+          - labels: '{}'
+            value: 0.929
+    alert_rule_test:
+      - eval_time: 28d8h5m
+        alertname: FhirMartsSloBreach
+        exp_alerts: 
+          - exp_labels:
+              severity: ticket
+            exp_annotations:
+              summary: "Fewer than 96.4 percent of days were on time in the last 28 days"
