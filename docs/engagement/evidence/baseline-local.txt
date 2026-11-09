@@ -1,0 +1,32 @@
+# Evidence: baseline local
+label: VERIFIED LOCALLY
+date: 2026-11-09 06:45 UTC
+code commit: ee5ae184c0ada1ceead9b3ff5edaf106ad493990
+working tree clean at run time: yes
+machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
+command: ruff, mypy, pytest fast, then Azurite, dbt and airflow marks (see gate script steps in output)
+notes: Baseline before any engagement change. Fast gate 33 passed; azurite 3 passed (61 s); dbt 3 passed (39 s); airflow 2 passed (38 s). Total about 2 m 52 s, measured on one laptop. Does not prove GitHub Actions results.
+---
+=== .venv/bin/ruff check .
+All checks passed!
+exit 0 duration 0s
+=== .venv/bin/mypy
+Success: no issues found in 9 source files
+exit 0 duration 2s
+=== nice -n 10 .venv/bin/python -m pytest -q -m not airflow and not dbt and not bicep and not azurite
+.................................                                        [100%]
+33 passed, 8 deselected in 1.28s
+exit 0 duration 2s
+=== flock $HEAVY_LOCK nice -n 10 .venv/bin/python -m pytest -q -m azurite
+...                                                                      [100%]
+3 passed, 38 deselected in 60.60s (0:01:00)
+exit 0 duration 61s
+=== flock $HEAVY_LOCK nice -n 10 .venv/bin/python -m pytest -q -m dbt
+...                                                                      [100%]
+3 passed, 38 deselected in 39.21s
+exit 0 duration 69s
+=== flock $HEAVY_LOCK nice -n 10 .venv/bin/python -m pytest -q -m airflow
+..                                                                       [100%]
+2 passed, 39 deselected in 37.50s
+exit 0 duration 38s
+
