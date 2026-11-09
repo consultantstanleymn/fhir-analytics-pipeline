@@ -14,6 +14,9 @@ authors = [{ name = "Stanley Sujith Nelavala" }]
 where = ["src", "."]
 include = ["fhir_pipeline*", "generator*"]
 
+[tool.setuptools.package-data]
+fhir_pipeline = ["*.json"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 markers = [

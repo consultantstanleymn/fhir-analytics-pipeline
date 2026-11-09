@@ -6,3 +6,5 @@ pytest
 ruff
 mypy
 types-requests
+jsonschema
+prometheus-client

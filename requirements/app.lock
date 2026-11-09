@@ -91,6 +91,7 @@ pathlib_abc==0.5.2
 pathspec==1.1.1
 pendulum==3.3.0
 pluggy==1.7.0
+prometheus-client==0.26.0
 protobuf==6.33.6
 psutil==7.2.2
 pycparser==3.12

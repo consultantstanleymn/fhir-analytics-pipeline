@@ -2,3 +2,5 @@ duckdb==2.0.0
 fhir.resources
 azure-storage-blob
 pytest
+jsonschema
+prometheus-client

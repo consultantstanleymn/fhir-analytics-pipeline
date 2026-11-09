@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Run provenance manifest",
+  "type": "object",
+  "required": ["run_date", "code_sha", "inputs", "dbt_manifest_sha256", "row_counts", "generated_at"],
+  "properties": {
+    "run_date": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$"},
+    "code_sha": {"type": "string", "minLength": 1},
+    "inputs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["blob", "sha256"],
+        "properties": {
+          "blob": {"type": "string", "minLength": 1},
+          "sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+        },
+        "additionalProperties": false
+      }
+    },
+    "dbt_manifest_sha256": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "row_counts": {
+      "type": "object",
+      "required": ["raw", "staging", "marts"],
+      "properties": {
+        "raw": {"$ref": "#/$defs/counts"},
+        "staging": {"$ref": "#/$defs/counts"},
+        "marts": {"$ref": "#/$defs/counts"}
+      },
+      "additionalProperties": false
+    },
+    "generated_at": {"type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}Z$"},
+    "kanon": {"type": "object"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "counts": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}}
+  }
+}
