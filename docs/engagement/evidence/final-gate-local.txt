@@ -5,7 +5,7 @@ code commit: 3eed2c4b6bfae9900dc0e77126dcd9268bec2313
 working tree clean at run time: yes
 machine: MacBook Pro (mid 2015), 8 logical CPUs, 16 GB RAM, Fedora 44, podman 5.8.7 (measured on one laptop)
 command: ruff, mypy, then pytest by mark: fast, azurite, dbt, airflow, bicep (see === lines)
-notes: Full gate at the end of the engagement: 106 tests in total (88 fast, 5 Azurite, 10 dbt, 2 Airflow only, 1 Bicep). Total run about 3.5 minutes, measured on one laptop. Does not prove any GitHub Actions run.
+notes: Full gate at the end of the engagement: 106 tests in total (88 fast, 5 Azurite, 10 dbt, 2 Airflow only, 1 Bicep). Total run about 3.5 minutes, measured on one laptop. Does not prove any GitHub Actions run. Scope of the code commit: the run used commit 3eed2c4. The next commit (1371715) adds only this file and one README line; it changes no code, test or config. Later commits change only docs and evidence files.
 ---
 === .venv/bin/ruff check .
 All checks passed!

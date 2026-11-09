@@ -2,10 +2,10 @@
   "$schema": "http://cyclonedx.org/schema/bom-1.6.schema.json",
   "bomFormat": "CycloneDX",
   "specVersion": "1.6",
-  "serialNumber": "urn:uuid:597c4836-aab0-4636-b88e-0e198ae22930",
+  "serialNumber": "urn:uuid:d18b7ba8-4258-4be8-b68f-14a73651fab4",
   "version": 1,
   "metadata": {
-    "timestamp": "2026-11-09T06:59:41+00:00",
+    "timestamp": "2026-11-09T12:21:44+00:00",
     "tools": {
       "components": [
         {
@@ -20,7 +20,7 @@
       ]
     },
     "component": {
-      "bom-ref": "1d90727c-8389-437c-9e7d-77c9cccc5b99",
+      "bom-ref": "4a18d5c7-2145-4bae-9427-e01a0345e926",
       "type": "application",
       "name": "requirements-locks",
       "properties": [
@@ -33,11 +33,23 @@
   },
   "components": [
     {
-      "bom-ref": "054b0a34-b3be-4b31-8301-120243dc20df",
+      "bom-ref": "00508b35-4bfe-4bf1-b8ec-601618d2c8bb",
       "type": "library",
-      "name": "jsonschema",
-      "version": "4.26.0",
-      "purl": "pkg:pypi/jsonschema@4.26.0",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -46,7 +58,7 @@
       ]
     },
     {
-      "bom-ref": "08db0640-0dc2-45d1-b612-27d541dc8d41",
+      "bom-ref": "02b610af-dccd-4ca4-8123-3800f77b6ea5",
       "type": "library",
       "name": "babel",
       "version": "2.18.0",
@@ -59,7 +71,20 @@
       ]
     },
     {
-      "bom-ref": "0a069b76-76ac-4b8f-a6c2-105c57424ea1",
+      "bom-ref": "04c9e0b8-1de3-449e-a90b-b893f08239d0",
+      "type": "library",
+      "name": "python-slugify",
+      "version": "9.1.3",
+      "purl": "pkg:pypi/python-slugify@9.1.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "06d38e5c-25ea-408d-ba96-0c3b71e8ed1c",
       "type": "library",
       "name": "sqlparse",
       "version": "0.6.1",
@@ -72,7 +97,208 @@
       ]
     },
     {
-      "bom-ref": "10a06b77-82fc-4a50-aaee-c176bc5e5051",
+      "bom-ref": "0c12978b-3448-4feb-9bfe-71cb13cff7ac",
+      "type": "library",
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "purl": "pkg:pypi/annotated-types@0.8.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "11c706a6-8f98-47bc-88eb-bb068f18e622",
+      "type": "library",
+      "name": "pluggy",
+      "version": "1.7.0",
+      "purl": "pkg:pypi/pluggy@1.7.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "14a9598c-1963-4c9c-805d-f49ddce9c924",
+      "type": "library",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "licenses": [
+        {
+          "license": {
+            "id": "BSD-3-Clause"
+          }
+        },
+        {
+          "license": {
+            "id": "Apache-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "18a48402-15f4-4dad-86af-02bc3785201d",
+      "type": "library",
+      "name": "requests",
+      "version": "2.34.2",
+      "purl": "pkg:pypi/requests@2.34.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "198f9cfb-c477-4e31-9d95-a231cea0b83a",
+      "type": "library",
+      "name": "typing_extensions",
+      "version": "4.16.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "PSF-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/typing-extensions@4.16.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "2402ac0d-9b06-48c7-bcf2-4410efa96331",
+      "type": "library",
+      "name": "protobuf",
+      "version": "6.33.6",
+      "purl": "pkg:pypi/protobuf@6.33.6",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "2452f5c2-07d9-4e5b-b9e5-fe30d8950222",
+      "type": "library",
+      "name": "babel",
+      "version": "2.18.0",
+      "purl": "pkg:pypi/babel@2.18.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "28674c61-6c36-4341-9896-44bf918a226b",
+      "type": "library",
+      "name": "jsonschema",
+      "version": "4.26.0",
+      "purl": "pkg:pypi/jsonschema@4.26.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "2b4e3ecc-8236-4d7c-936f-ef183b4b2a36",
+      "type": "library",
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "purl": "pkg:pypi/jsonschema-specifications@2025.9.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "2c041691-058b-4bbe-91c9-3f37abd57c33",
+      "type": "library",
+      "name": "annotated-types",
+      "version": "0.8.0",
+      "purl": "pkg:pypi/annotated-types@0.8.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "2d85e111-e287-4ead-8b55-f277c8239bab",
+      "type": "library",
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "purl": "pkg:pypi/charset-normalizer@3.5.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "32735b17-2e2f-4a3a-b085-db590dd123c1",
+      "type": "library",
+      "name": "MarkupSafe",
+      "version": "3.0.4",
+      "purl": "pkg:pypi/markupsafe@3.0.4",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "3a70e816-c2ff-4602-9b8d-d3d8cd5f9122",
+      "type": "library",
+      "name": "text-unidecode",
+      "version": "1.3",
+      "purl": "pkg:pypi/text-unidecode@1.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "475cefae-c352-4008-a2b0-823a8c5a0590",
+      "type": "library",
+      "name": "opentelemetry-api",
+      "version": "1.45.2",
+      "purl": "pkg:pypi/opentelemetry-api@1.45.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "5131eaee-c323-4235-98f8-e449ca6fbff2",
       "type": "library",
       "name": "six",
       "version": "1.17.0",
@@ -92,11 +318,11 @@
       ]
     },
     {
-      "bom-ref": "12e84236-ad66-4584-a896-11aef15609c6",
+      "bom-ref": "54e94c0d-5f3e-42ed-9649-2e6da0a20241",
       "type": "library",
-      "name": "PyYAML",
-      "version": "6.0.3",
-      "purl": "pkg:pypi/pyyaml@6.0.3",
+      "name": "packaging",
+      "version": "26.3",
+      "purl": "pkg:pypi/packaging@26.3",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -105,20 +331,7 @@
       ]
     },
     {
-      "bom-ref": "13b538ec-bddb-46bd-8564-c228d3add7c4",
-      "type": "library",
-      "name": "attrs",
-      "version": "26.1.0",
-      "purl": "pkg:pypi/attrs@26.1.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "1590eb57-e725-4c3c-9e36-9d7bc6fd02cf",
+      "bom-ref": "5c583edc-553c-4111-a591-1a94b5e213eb",
       "type": "library",
       "name": "Pygments",
       "version": "2.21.0",
@@ -131,7 +344,209 @@
       ]
     },
     {
-      "bom-ref": "164f3551-f08d-4257-9017-aed3bd9ac925",
+      "bom-ref": "5d47b4fe-61a6-4f7c-97f9-663f6283bbd4",
+      "type": "library",
+      "name": "tabulate",
+      "version": "0.10.0",
+      "purl": "pkg:pypi/tabulate@0.10.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "5f8d3ff5-5bd2-4e7f-8283-657d98c8d676",
+      "type": "library",
+      "name": "pluggy",
+      "version": "1.7.0",
+      "purl": "pkg:pypi/pluggy@1.7.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "602efb06-6e5c-4fa2-af6e-2da43edb7998",
+      "type": "library",
+      "name": "zipp",
+      "version": "4.1.2",
+      "purl": "pkg:pypi/zipp@4.1.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "62a07975-a4e0-4ab5-a599-0dc20cd42145",
+      "type": "library",
+      "name": "MarkupSafe",
+      "version": "3.0.4",
+      "purl": "pkg:pypi/markupsafe@3.0.4",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "638f87a2-7bbe-464e-86ed-ffe398d4e90b",
+      "type": "library",
+      "name": "packaging",
+      "version": "26.3",
+      "purl": "pkg:pypi/packaging@26.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "669b4efa-c44f-4d4d-a713-e7754bdd8fb5",
+      "type": "library",
+      "name": "duckdb",
+      "version": "2.0.0",
+      "purl": "pkg:pypi/duckdb@2.0.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "6be41021-a2d7-410d-a4c2-b1445533ab82",
+      "type": "library",
+      "name": "certifi",
+      "version": "2026.10.23",
+      "purl": "pkg:pypi/certifi@2026.10.23",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "7b98d0fc-1878-45e9-96d1-a889764b907a",
+      "type": "library",
+      "name": "duckdb",
+      "version": "2.0.0",
+      "purl": "pkg:pypi/duckdb@2.0.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "80180e0b-7fea-460e-b805-897ad9f8e65b",
+      "type": "library",
+      "name": "Pygments",
+      "version": "2.21.0",
+      "purl": "pkg:pypi/pygments@2.21.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "85f0cace-3d96-4176-9ce9-f9f05a32b95b",
+      "type": "library",
+      "name": "PyYAML",
+      "version": "6.0.3",
+      "purl": "pkg:pypi/pyyaml@6.0.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "8747da78-9900-4f8b-ab54-7dae6c262465",
+      "type": "library",
+      "name": "rpds-py",
+      "version": "2026.9.1",
+      "purl": "pkg:pypi/rpds-py@2026.9.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "8797052d-a1f9-4f02-be3f-04b2d62bbb52",
+      "type": "library",
+      "name": "typing_extensions",
+      "version": "4.16.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "PSF-2.0"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/typing-extensions@4.16.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "8f39894d-9507-4ee7-8c3a-7dfe82ec12f4",
+      "type": "library",
+      "name": "referencing",
+      "version": "0.37.0",
+      "purl": "pkg:pypi/referencing@0.37.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "931dce82-ba79-40fd-b1f2-6e8081a9c456",
+      "type": "library",
+      "name": "opentelemetry-api",
+      "version": "1.45.2",
+      "purl": "pkg:pypi/opentelemetry-api@1.45.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "9744daea-39d2-4f14-ba12-240102f99245",
+      "type": "library",
+      "name": "python-slugify",
+      "version": "9.1.3",
+      "purl": "pkg:pypi/python-slugify@9.1.3",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "985070eb-cbdf-4e6a-a813-366bd86409fc",
       "type": "library",
       "name": "isodate",
       "version": "0.7.2",
@@ -151,11 +566,11 @@
       ]
     },
     {
-      "bom-ref": "21d21656-f893-4178-84cf-e4b953eba347",
+      "bom-ref": "98daf6c9-a11e-459e-bee4-135ab73b00bc",
       "type": "library",
-      "name": "zipp",
-      "version": "4.1.2",
-      "purl": "pkg:pypi/zipp@4.1.2",
+      "name": "Jinja2",
+      "version": "3.1.6",
+      "purl": "pkg:pypi/jinja2@3.1.6",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -164,11 +579,11 @@
       ]
     },
     {
-      "bom-ref": "21fd45df-bb7a-49f5-8681-f8ce75f63883",
+      "bom-ref": "9a0fb234-1959-44d1-b52f-cc9accea2ad5",
       "type": "library",
-      "name": "annotated-types",
-      "version": "0.8.0",
-      "purl": "pkg:pypi/annotated-types@0.8.0",
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "purl": "pkg:pypi/jsonschema-specifications@2025.9.1",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -177,7 +592,46 @@
       ]
     },
     {
-      "bom-ref": "25761909-d601-429f-a776-f24d71fe8986",
+      "bom-ref": "9e1fc171-8b69-47c3-bdae-03731f3459aa",
+      "type": "library",
+      "name": "rpds-py",
+      "version": "2026.9.1",
+      "purl": "pkg:pypi/rpds-py@2026.9.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "a56abfd6-04c5-404c-8f28-6b79a3be5243",
+      "type": "library",
+      "name": "jsonschema",
+      "version": "4.26.0",
+      "purl": "pkg:pypi/jsonschema@4.26.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "ac88f522-2e8a-4065-a8b1-268254a459ef",
+      "type": "library",
+      "name": "python-dotenv",
+      "version": "1.2.4",
+      "purl": "pkg:pypi/python-dotenv@1.2.4",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "af78d466-f2a4-454c-a550-c097503b645b",
       "type": "application",
       "name": "dbt/requirements.txt",
       "properties": [
@@ -192,33 +646,7 @@
       ]
     },
     {
-      "bom-ref": "2578a0ef-07b5-4961-9dc2-40f50c8d0318",
-      "type": "library",
-      "name": "idna",
-      "version": "3.20",
-      "purl": "pkg:pypi/idna@3.20",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "2835c9fd-79cb-422d-b141-fa7ecaf8d05d",
-      "type": "library",
-      "name": "duckdb",
-      "version": "2.0.0",
-      "purl": "pkg:pypi/duckdb@2.0.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "28bbaf94-b891-4012-9a6a-89489e236dde",
+      "bom-ref": "b179f51c-ae3d-43a9-a733-8631b4509f7a",
       "type": "library",
       "name": "attrs",
       "version": "26.1.0",
@@ -231,11 +659,11 @@
       ]
     },
     {
-      "bom-ref": "29bb9594-cf8d-423a-a386-a574bbe39bab",
+      "bom-ref": "b84349f4-e210-465f-a4bc-a4da84ec8da1",
       "type": "library",
-      "name": "duckdb",
-      "version": "2.0.0",
-      "purl": "pkg:pypi/duckdb@2.0.0",
+      "name": "attrs",
+      "version": "26.1.0",
+      "purl": "pkg:pypi/attrs@26.1.0",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -244,11 +672,11 @@
       ]
     },
     {
-      "bom-ref": "2a4626e8-4897-4240-aa2e-531694fffc67",
+      "bom-ref": "bb47c590-2e5e-4b8c-b977-02ffe17b544f",
       "type": "library",
-      "name": "protobuf",
-      "version": "6.33.6",
-      "purl": "pkg:pypi/protobuf@6.33.6",
+      "name": "idna",
+      "version": "3.20",
+      "purl": "pkg:pypi/idna@3.20",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -257,241 +685,7 @@
       ]
     },
     {
-      "bom-ref": "2c9b7613-7b45-4d86-956f-7825ccbfcb7e",
-      "type": "library",
-      "name": "requests",
-      "version": "2.34.2",
-      "purl": "pkg:pypi/requests@2.34.2",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "2dc725f4-138e-4f0e-988b-658229c7eb35",
-      "type": "library",
-      "name": "pluggy",
-      "version": "1.7.0",
-      "purl": "pkg:pypi/pluggy@1.7.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "2ee02bf3-491d-40a5-a713-7b758e4778dd",
-      "type": "library",
-      "name": "opentelemetry-api",
-      "version": "1.45.2",
-      "purl": "pkg:pypi/opentelemetry-api@1.45.2",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "30c6f0dd-be89-40bf-9680-3626ed5a53b1",
-      "type": "library",
-      "name": "referencing",
-      "version": "0.37.0",
-      "purl": "pkg:pypi/referencing@0.37.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "32699f1c-cef4-457c-980b-9abac11a09f5",
-      "type": "library",
-      "name": "rpds-py",
-      "version": "2026.9.1",
-      "purl": "pkg:pypi/rpds-py@2026.9.1",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "3550bd28-2906-43c7-94fd-1f0bae57bb17",
-      "type": "library",
-      "name": "requests",
-      "version": "2.34.2",
-      "purl": "pkg:pypi/requests@2.34.2",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "389dcf00-a844-4d32-9e3e-afe5014af207",
-      "type": "library",
-      "name": "text-unidecode",
-      "version": "1.3",
-      "purl": "pkg:pypi/text-unidecode@1.3",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "3a92ce69-1683-406c-a8d5-ce4a8a6d68dd",
-      "type": "library",
-      "name": "packaging",
-      "version": "26.3",
-      "purl": "pkg:pypi/packaging@26.3",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "4e7a588c-5d62-467b-a8f9-650b100b0c3b",
-      "type": "library",
-      "name": "typing_extensions",
-      "version": "4.16.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "PSF-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:pypi/typing-extensions@4.16.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "52a132f1-94aa-4cb0-a73e-b28c0a81959f",
-      "type": "library",
-      "name": "Pygments",
-      "version": "2.21.0",
-      "purl": "pkg:pypi/pygments@2.21.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "59529d6d-2233-4301-876c-e7bfaea136e5",
-      "type": "library",
-      "name": "certifi",
-      "version": "2026.10.23",
-      "purl": "pkg:pypi/certifi@2026.10.23",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "6079e813-023f-43e9-bce3-1639cbeefbc9",
-      "type": "library",
-      "name": "sqlparse",
-      "version": "0.6.1",
-      "purl": "pkg:pypi/sqlparse@0.6.1",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "80e0a6af-c637-4590-884b-9fff234243f6",
-      "type": "library",
-      "name": "urllib3",
-      "version": "2.8.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "purl": "pkg:pypi/urllib3@2.8.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "817874a6-665e-4136-a6e8-ff44d5d3b313",
-      "type": "library",
-      "name": "pluggy",
-      "version": "1.7.0",
-      "purl": "pkg:pypi/pluggy@1.7.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "84bb4f87-706c-42a7-9350-314956d291bb",
-      "type": "library",
-      "name": "python-slugify",
-      "version": "9.1.3",
-      "purl": "pkg:pypi/python-slugify@9.1.3",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "87089f74-e91c-47da-bdd4-31e193bf74ed",
-      "type": "library",
-      "name": "python-dateutil",
-      "version": "2.9.0.post0",
-      "licenses": [
-        {
-          "license": {
-            "id": "BSD-3-Clause"
-          }
-        },
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "87b9fa5b-7166-47a8-abb0-9b9d346998d6",
+      "bom-ref": "c24c168f-605c-497b-819e-1a7b54628186",
       "type": "library",
       "name": "python-dotenv",
       "version": "1.2.4",
@@ -504,20 +698,7 @@
       ]
     },
     {
-      "bom-ref": "9738687d-d347-4517-b6d4-b19f64879e82",
-      "type": "library",
-      "name": "packaging",
-      "version": "26.3",
-      "purl": "pkg:pypi/packaging@26.3",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "978ca138-022d-4140-aae5-e5b1d3264a5f",
+      "bom-ref": "c34e52bf-0ca8-4af7-9a8d-d3ba00923db4",
       "type": "library",
       "name": "Jinja2",
       "version": "3.1.6",
@@ -530,85 +711,7 @@
       ]
     },
     {
-      "bom-ref": "9e5fe54e-d246-4843-930e-2562311dfdb7",
-      "type": "library",
-      "name": "referencing",
-      "version": "0.37.0",
-      "purl": "pkg:pypi/referencing@0.37.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "9f29b290-4835-4729-8d3a-4aa4ee5edd31",
-      "type": "library",
-      "name": "tabulate",
-      "version": "0.10.0",
-      "purl": "pkg:pypi/tabulate@0.10.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "a09077c5-607f-4071-bee0-299a7f9bc2db",
-      "type": "library",
-      "name": "Jinja2",
-      "version": "3.1.6",
-      "purl": "pkg:pypi/jinja2@3.1.6",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "a2ab48db-a74f-4482-83df-3e1128c03231",
-      "type": "library",
-      "name": "protobuf",
-      "version": "6.33.6",
-      "purl": "pkg:pypi/protobuf@6.33.6",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "af83ce5e-3913-4e25-bfdb-bfc86349d3e0",
-      "type": "library",
-      "name": "jsonschema-specifications",
-      "version": "2025.9.1",
-      "purl": "pkg:pypi/jsonschema-specifications@2025.9.1",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "affb19e2-9d0e-4d96-bb1f-8e86cf936b24",
-      "type": "library",
-      "name": "zipp",
-      "version": "4.1.2",
-      "purl": "pkg:pypi/zipp@4.1.2",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "b00e45ed-cc9e-4474-8571-a964de2f722b",
+      "bom-ref": "c683e064-a875-460c-abaa-e370fa6d9ea0",
       "type": "application",
       "name": "app/requirements.txt",
       "properties": [
@@ -623,215 +726,7 @@
       ]
     },
     {
-      "bom-ref": "b0368b7d-37fd-45a0-9ef5-de9fd003a1c6",
-      "type": "library",
-      "name": "certifi",
-      "version": "2026.10.23",
-      "purl": "pkg:pypi/certifi@2026.10.23",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "b8518c7e-4d25-49fe-a0d2-c610b6c33bd5",
-      "type": "library",
-      "name": "jsonschema-specifications",
-      "version": "2025.9.1",
-      "purl": "pkg:pypi/jsonschema-specifications@2025.9.1",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "c0fe5548-978d-4ae7-8a0f-c8a5f370b424",
-      "type": "library",
-      "name": "idna",
-      "version": "3.20",
-      "purl": "pkg:pypi/idna@3.20",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "c3cf550a-0415-4cc7-828e-9e1c79424fdb",
-      "type": "library",
-      "name": "annotated-types",
-      "version": "0.8.0",
-      "purl": "pkg:pypi/annotated-types@0.8.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "c79a1f8f-250d-4bce-a00b-1f62d5031c2c",
-      "type": "library",
-      "name": "jsonschema",
-      "version": "4.26.0",
-      "purl": "pkg:pypi/jsonschema@4.26.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "cc62403a-fc73-49cb-9885-74da5e04bc2f",
-      "type": "library",
-      "name": "python-dateutil",
-      "version": "2.9.0.post0",
-      "licenses": [
-        {
-          "license": {
-            "id": "BSD-3-Clause"
-          }
-        },
-        {
-          "license": {
-            "id": "Apache-2.0"
-          }
-        }
-      ],
-      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "ccd53f2c-70fe-4583-b7e6-c2b207e75f50",
-      "type": "library",
-      "name": "opentelemetry-api",
-      "version": "1.45.2",
-      "purl": "pkg:pypi/opentelemetry-api@1.45.2",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "d589592a-1f02-4cf1-b6a5-56b57d37c1c2",
-      "type": "library",
-      "name": "isodate",
-      "version": "0.7.2",
-      "licenses": [
-        {
-          "license": {
-            "id": "BSD-3-Clause"
-          }
-        }
-      ],
-      "purl": "pkg:pypi/isodate@0.7.2",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "d7932281-b008-496b-95f5-079e7fdd8313",
-      "type": "library",
-      "name": "python-dotenv",
-      "version": "1.2.4",
-      "purl": "pkg:pypi/python-dotenv@1.2.4",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "d8337d5a-a988-4888-9d63-e48857f8f232",
-      "type": "library",
-      "name": "MarkupSafe",
-      "version": "3.0.4",
-      "purl": "pkg:pypi/markupsafe@3.0.4",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "da190a21-27fc-4490-8e96-04261bfe5b2e",
-      "type": "library",
-      "name": "urllib3",
-      "version": "2.8.0",
-      "licenses": [
-        {
-          "license": {
-            "id": "MIT"
-          }
-        }
-      ],
-      "purl": "pkg:pypi/urllib3@2.8.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "e0ca305d-1bfb-49df-94de-379098086590",
-      "type": "library",
-      "name": "rpds-py",
-      "version": "2026.9.1",
-      "purl": "pkg:pypi/rpds-py@2026.9.1",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "e56016fc-d69e-4335-aadd-3f6f2ddfd003",
-      "type": "library",
-      "name": "tabulate",
-      "version": "0.10.0",
-      "purl": "pkg:pypi/tabulate@0.10.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "e68116ad-4c6f-4ad1-ac90-7a5de80dc5ee",
-      "type": "library",
-      "name": "babel",
-      "version": "2.18.0",
-      "purl": "pkg:pypi/babel@2.18.0",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "e6a1fff1-0ec5-4975-b826-af53bfa9b149",
+      "bom-ref": "c8bffb58-2dd2-4f74-922d-b1b403be2c3a",
       "type": "library",
       "name": "six",
       "version": "1.17.0",
@@ -851,11 +746,11 @@
       ]
     },
     {
-      "bom-ref": "ea7e38bb-dd51-4315-9dee-71015505d86c",
+      "bom-ref": "ce088089-8dd3-4a50-9150-06b6beb8bd17",
       "type": "library",
-      "name": "MarkupSafe",
-      "version": "3.0.4",
-      "purl": "pkg:pypi/markupsafe@3.0.4",
+      "name": "requests",
+      "version": "2.34.2",
+      "purl": "pkg:pypi/requests@2.34.2",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -864,20 +759,7 @@
       ]
     },
     {
-      "bom-ref": "eb742e08-bbf8-45d4-af2b-6402e9b10a30",
-      "type": "library",
-      "name": "charset-normalizer",
-      "version": "3.5.2",
-      "purl": "pkg:pypi/charset-normalizer@3.5.2",
-      "properties": [
-        {
-          "name": "aquasecurity:trivy:PkgType",
-          "value": "pip"
-        }
-      ]
-    },
-    {
-      "bom-ref": "ed29112d-d294-47bb-b0b8-9cebe5ab8f56",
+      "bom-ref": "ce80d650-c96c-4eba-9ea4-322643b4c5d7",
       "type": "library",
       "name": "PyYAML",
       "version": "6.0.3",
@@ -890,7 +772,27 @@
       ]
     },
     {
-      "bom-ref": "f59620b7-4ee1-41f1-9395-eaecd26663bb",
+      "bom-ref": "d371d969-8cea-4456-896c-9f97afedb437",
+      "type": "library",
+      "name": "urllib3",
+      "version": "2.8.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/urllib3@2.8.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "d46e76a8-58d7-4b01-9d47-98d97084ff6e",
       "type": "library",
       "name": "text-unidecode",
       "version": "1.3",
@@ -903,18 +805,18 @@
       ]
     },
     {
-      "bom-ref": "f82bfd0a-657d-48cd-a174-0194bd5dc3ed",
+      "bom-ref": "d68fa40d-3a05-4522-a4cc-1d16d254fe72",
       "type": "library",
-      "name": "typing_extensions",
-      "version": "4.16.0",
+      "name": "isodate",
+      "version": "0.7.2",
       "licenses": [
         {
           "license": {
-            "id": "PSF-2.0"
+            "id": "BSD-3-Clause"
           }
         }
       ],
-      "purl": "pkg:pypi/typing-extensions@4.16.0",
+      "purl": "pkg:pypi/isodate@0.7.2",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -923,11 +825,11 @@
       ]
     },
     {
-      "bom-ref": "fa765d6d-67ce-4aba-ac71-d7989cb185c9",
+      "bom-ref": "d95056c5-54a4-45a8-b430-27ac8c345b99",
       "type": "library",
-      "name": "python-slugify",
-      "version": "9.1.3",
-      "purl": "pkg:pypi/python-slugify@9.1.3",
+      "name": "protobuf",
+      "version": "6.33.6",
+      "purl": "pkg:pypi/protobuf@6.33.6",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -936,11 +838,109 @@
       ]
     },
     {
-      "bom-ref": "fbee6097-2271-4bf8-b0a3-cf6116f124aa",
+      "bom-ref": "dbaef24b-0d62-4a24-9503-abf20b1473d2",
+      "type": "library",
+      "name": "sqlparse",
+      "version": "0.6.1",
+      "purl": "pkg:pypi/sqlparse@0.6.1",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "dcc158ad-9b6d-4f3f-ad0f-7d4e25c4b20c",
+      "type": "library",
+      "name": "idna",
+      "version": "3.20",
+      "purl": "pkg:pypi/idna@3.20",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "e76a8311-eaa9-4b7d-9133-4b073f286a6f",
+      "type": "library",
+      "name": "referencing",
+      "version": "0.37.0",
+      "purl": "pkg:pypi/referencing@0.37.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "e9e4977d-3017-4df7-9552-e98b78e3db62",
+      "type": "library",
+      "name": "zipp",
+      "version": "4.1.2",
+      "purl": "pkg:pypi/zipp@4.1.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "ec1a63bc-687f-49c7-90ec-233e6957538c",
+      "type": "library",
+      "name": "certifi",
+      "version": "2026.10.23",
+      "purl": "pkg:pypi/certifi@2026.10.23",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "f1a1d7ce-3652-4a54-a7b0-ab4936d92cc9",
       "type": "library",
       "name": "charset-normalizer",
       "version": "3.5.2",
       "purl": "pkg:pypi/charset-normalizer@3.5.2",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "f509719f-bb15-4691-98f2-f543ae91f1b9",
+      "type": "library",
+      "name": "tabulate",
+      "version": "0.10.0",
+      "purl": "pkg:pypi/tabulate@0.10.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
+      "bom-ref": "f72467b3-87b0-4fd7-93fc-84e102c7f222",
+      "type": "library",
+      "name": "urllib3",
+      "version": "2.8.0",
+      "licenses": [
+        {
+          "license": {
+            "id": "MIT"
+          }
+        }
+      ],
+      "purl": "pkg:pypi/urllib3@2.8.0",
       "properties": [
         {
           "name": "aquasecurity:trivy:PkgType",
@@ -2329,6 +2329,19 @@
       ]
     },
     {
+      "bom-ref": "pkg:pypi/prometheus-client@0.26.0",
+      "type": "library",
+      "name": "prometheus-client",
+      "version": "0.26.0",
+      "purl": "pkg:pypi/prometheus-client@0.26.0",
+      "properties": [
+        {
+          "name": "aquasecurity:trivy:PkgType",
+          "value": "pip"
+        }
+      ]
+    },
+    {
       "bom-ref": "pkg:pypi/psutil@7.2.2",
       "type": "library",
       "name": "psutil",
@@ -2981,86 +2994,214 @@
   ],
   "dependencies": [
     {
-      "ref": "054b0a34-b3be-4b31-8301-120243dc20df",
+      "ref": "00508b35-4bfe-4bf1-b8ec-601618d2c8bb",
       "dependsOn": []
     },
     {
-      "ref": "08db0640-0dc2-45d1-b612-27d541dc8d41",
+      "ref": "02b610af-dccd-4ca4-8123-3800f77b6ea5",
       "dependsOn": []
     },
     {
-      "ref": "0a069b76-76ac-4b8f-a6c2-105c57424ea1",
+      "ref": "04c9e0b8-1de3-449e-a90b-b893f08239d0",
       "dependsOn": []
     },
     {
-      "ref": "10a06b77-82fc-4a50-aaee-c176bc5e5051",
+      "ref": "06d38e5c-25ea-408d-ba96-0c3b71e8ed1c",
       "dependsOn": []
     },
     {
-      "ref": "12e84236-ad66-4584-a896-11aef15609c6",
+      "ref": "0c12978b-3448-4feb-9bfe-71cb13cff7ac",
       "dependsOn": []
     },
     {
-      "ref": "13b538ec-bddb-46bd-8564-c228d3add7c4",
+      "ref": "11c706a6-8f98-47bc-88eb-bb068f18e622",
       "dependsOn": []
     },
     {
-      "ref": "1590eb57-e725-4c3c-9e36-9d7bc6fd02cf",
+      "ref": "14a9598c-1963-4c9c-805d-f49ddce9c924",
       "dependsOn": []
     },
     {
-      "ref": "164f3551-f08d-4257-9017-aed3bd9ac925",
+      "ref": "18a48402-15f4-4dad-86af-02bc3785201d",
       "dependsOn": []
     },
     {
-      "ref": "1d90727c-8389-437c-9e7d-77c9cccc5b99",
+      "ref": "198f9cfb-c477-4e31-9d95-a231cea0b83a",
+      "dependsOn": []
+    },
+    {
+      "ref": "2402ac0d-9b06-48c7-bcf2-4410efa96331",
+      "dependsOn": []
+    },
+    {
+      "ref": "2452f5c2-07d9-4e5b-b9e5-fe30d8950222",
+      "dependsOn": []
+    },
+    {
+      "ref": "28674c61-6c36-4341-9896-44bf918a226b",
+      "dependsOn": []
+    },
+    {
+      "ref": "2b4e3ecc-8236-4d7c-936f-ef183b4b2a36",
+      "dependsOn": []
+    },
+    {
+      "ref": "2c041691-058b-4bbe-91c9-3f37abd57c33",
+      "dependsOn": []
+    },
+    {
+      "ref": "2d85e111-e287-4ead-8b55-f277c8239bab",
+      "dependsOn": []
+    },
+    {
+      "ref": "32735b17-2e2f-4a3a-b085-db590dd123c1",
+      "dependsOn": []
+    },
+    {
+      "ref": "3a70e816-c2ff-4602-9b8d-d3d8cd5f9122",
+      "dependsOn": []
+    },
+    {
+      "ref": "475cefae-c352-4008-a2b0-823a8c5a0590",
+      "dependsOn": []
+    },
+    {
+      "ref": "4a18d5c7-2145-4bae-9427-e01a0345e926",
       "dependsOn": [
-        "25761909-d601-429f-a776-f24d71fe8986",
-        "b00e45ed-cc9e-4474-8571-a964de2f722b"
+        "af78d466-f2a4-454c-a550-c097503b645b",
+        "c683e064-a875-460c-abaa-e370fa6d9ea0"
       ]
     },
     {
-      "ref": "21d21656-f893-4178-84cf-e4b953eba347",
+      "ref": "5131eaee-c323-4235-98f8-e449ca6fbff2",
       "dependsOn": []
     },
     {
-      "ref": "21fd45df-bb7a-49f5-8681-f8ce75f63883",
+      "ref": "54e94c0d-5f3e-42ed-9649-2e6da0a20241",
       "dependsOn": []
     },
     {
-      "ref": "25761909-d601-429f-a776-f24d71fe8986",
+      "ref": "5c583edc-553c-4111-a591-1a94b5e213eb",
+      "dependsOn": []
+    },
+    {
+      "ref": "5d47b4fe-61a6-4f7c-97f9-663f6283bbd4",
+      "dependsOn": []
+    },
+    {
+      "ref": "5f8d3ff5-5bd2-4e7f-8283-657d98c8d676",
+      "dependsOn": []
+    },
+    {
+      "ref": "602efb06-6e5c-4fa2-af6e-2da43edb7998",
+      "dependsOn": []
+    },
+    {
+      "ref": "62a07975-a4e0-4ab5-a599-0dc20cd42145",
+      "dependsOn": []
+    },
+    {
+      "ref": "638f87a2-7bbe-464e-86ed-ffe398d4e90b",
+      "dependsOn": []
+    },
+    {
+      "ref": "669b4efa-c44f-4d4d-a713-e7754bdd8fb5",
+      "dependsOn": []
+    },
+    {
+      "ref": "6be41021-a2d7-410d-a4c2-b1445533ab82",
+      "dependsOn": []
+    },
+    {
+      "ref": "7b98d0fc-1878-45e9-96d1-a889764b907a",
+      "dependsOn": []
+    },
+    {
+      "ref": "80180e0b-7fea-460e-b805-897ad9f8e65b",
+      "dependsOn": []
+    },
+    {
+      "ref": "85f0cace-3d96-4176-9ce9-f9f05a32b95b",
+      "dependsOn": []
+    },
+    {
+      "ref": "8747da78-9900-4f8b-ab54-7dae6c262465",
+      "dependsOn": []
+    },
+    {
+      "ref": "8797052d-a1f9-4f02-be3f-04b2d62bbb52",
+      "dependsOn": []
+    },
+    {
+      "ref": "8f39894d-9507-4ee7-8c3a-7dfe82ec12f4",
+      "dependsOn": []
+    },
+    {
+      "ref": "931dce82-ba79-40fd-b1f2-6e8081a9c456",
+      "dependsOn": []
+    },
+    {
+      "ref": "9744daea-39d2-4f14-ba12-240102f99245",
+      "dependsOn": []
+    },
+    {
+      "ref": "985070eb-cbdf-4e6a-a813-366bd86409fc",
+      "dependsOn": []
+    },
+    {
+      "ref": "98daf6c9-a11e-459e-bee4-135ab73b00bc",
+      "dependsOn": []
+    },
+    {
+      "ref": "9a0fb234-1959-44d1-b52f-cc9accea2ad5",
+      "dependsOn": []
+    },
+    {
+      "ref": "9e1fc171-8b69-47c3-bdae-03731f3459aa",
+      "dependsOn": []
+    },
+    {
+      "ref": "a56abfd6-04c5-404c-8f28-6b79a3be5243",
+      "dependsOn": []
+    },
+    {
+      "ref": "ac88f522-2e8a-4065-a8b1-268254a459ef",
+      "dependsOn": []
+    },
+    {
+      "ref": "af78d466-f2a4-454c-a550-c097503b645b",
       "dependsOn": [
-        "08db0640-0dc2-45d1-b612-27d541dc8d41",
-        "0a069b76-76ac-4b8f-a6c2-105c57424ea1",
-        "12e84236-ad66-4584-a896-11aef15609c6",
-        "1590eb57-e725-4c3c-9e36-9d7bc6fd02cf",
-        "164f3551-f08d-4257-9017-aed3bd9ac925",
-        "21d21656-f893-4178-84cf-e4b953eba347",
-        "2835c9fd-79cb-422d-b141-fa7ecaf8d05d",
-        "28bbaf94-b891-4012-9a6a-89489e236dde",
-        "2a4626e8-4897-4240-aa2e-531694fffc67",
-        "2c9b7613-7b45-4d86-956f-7825ccbfcb7e",
-        "30c6f0dd-be89-40bf-9680-3626ed5a53b1",
-        "389dcf00-a844-4d32-9e3e-afe5014af207",
-        "3a92ce69-1683-406c-a8d5-ce4a8a6d68dd",
-        "4e7a588c-5d62-467b-a8f9-650b100b0c3b",
-        "80e0a6af-c637-4590-884b-9fff234243f6",
-        "817874a6-665e-4136-a6e8-ff44d5d3b313",
-        "84bb4f87-706c-42a7-9350-314956d291bb",
-        "978ca138-022d-4140-aae5-e5b1d3264a5f",
-        "b0368b7d-37fd-45a0-9ef5-de9fd003a1c6",
-        "b8518c7e-4d25-49fe-a0d2-c610b6c33bd5",
-        "c0fe5548-978d-4ae7-8a0f-c8a5f370b424",
-        "c3cf550a-0415-4cc7-828e-9e1c79424fdb",
-        "c79a1f8f-250d-4bce-a00b-1f62d5031c2c",
-        "cc62403a-fc73-49cb-9885-74da5e04bc2f",
-        "ccd53f2c-70fe-4583-b7e6-c2b207e75f50",
-        "d7932281-b008-496b-95f5-079e7fdd8313",
-        "d8337d5a-a988-4888-9d63-e48857f8f232",
-        "e0ca305d-1bfb-49df-94de-379098086590",
-        "e56016fc-d69e-4335-aadd-3f6f2ddfd003",
-        "e6a1fff1-0ec5-4975-b826-af53bfa9b149",
-        "fbee6097-2271-4bf8-b0a3-cf6116f124aa",
+        "00508b35-4bfe-4bf1-b8ec-601618d2c8bb",
+        "04c9e0b8-1de3-449e-a90b-b893f08239d0",
+        "11c706a6-8f98-47bc-88eb-bb068f18e622",
+        "18a48402-15f4-4dad-86af-02bc3785201d",
+        "2402ac0d-9b06-48c7-bcf2-4410efa96331",
+        "2452f5c2-07d9-4e5b-b9e5-fe30d8950222",
+        "28674c61-6c36-4341-9896-44bf918a226b",
+        "2c041691-058b-4bbe-91c9-3f37abd57c33",
+        "2d85e111-e287-4ead-8b55-f277c8239bab",
+        "3a70e816-c2ff-4602-9b8d-d3d8cd5f9122",
+        "5d47b4fe-61a6-4f7c-97f9-663f6283bbd4",
+        "62a07975-a4e0-4ab5-a599-0dc20cd42145",
+        "638f87a2-7bbe-464e-86ed-ffe398d4e90b",
+        "6be41021-a2d7-410d-a4c2-b1445533ab82",
+        "7b98d0fc-1878-45e9-96d1-a889764b907a",
+        "80180e0b-7fea-460e-b805-897ad9f8e65b",
+        "85f0cace-3d96-4176-9ce9-f9f05a32b95b",
+        "8797052d-a1f9-4f02-be3f-04b2d62bbb52",
+        "931dce82-ba79-40fd-b1f2-6e8081a9c456",
+        "9a0fb234-1959-44d1-b52f-cc9accea2ad5",
+        "9e1fc171-8b69-47c3-bdae-03731f3459aa",
+        "b84349f4-e210-465f-a4bc-a4da84ec8da1",
+        "bb47c590-2e5e-4b8c-b977-02ffe17b544f",
+        "c24c168f-605c-497b-819e-1a7b54628186",
+        "c34e52bf-0ca8-4af7-9a8d-d3ba00923db4",
+        "c8bffb58-2dd2-4f74-922d-b1b403be2c3a",
+        "d371d969-8cea-4456-896c-9f97afedb437",
+        "d68fa40d-3a05-4522-a4cc-1d16d254fe72",
+        "dbaef24b-0d62-4a24-9503-abf20b1473d2",
+        "e76a8311-eaa9-4b7d-9133-4b073f286a6f",
+        "e9e4977d-3017-4df7-9552-e98b78e3db62",
         "pkg:pypi/agate@1.9.1",
         "pkg:pypi/chardet@7.7.0",
         "pkg:pypi/click@8.5.1",
@@ -3103,159 +3244,59 @@
       ]
     },
     {
-      "ref": "2578a0ef-07b5-4961-9dc2-40f50c8d0318",
+      "ref": "b179f51c-ae3d-43a9-a733-8631b4509f7a",
       "dependsOn": []
     },
     {
-      "ref": "2835c9fd-79cb-422d-b141-fa7ecaf8d05d",
+      "ref": "b84349f4-e210-465f-a4bc-a4da84ec8da1",
       "dependsOn": []
     },
     {
-      "ref": "28bbaf94-b891-4012-9a6a-89489e236dde",
+      "ref": "bb47c590-2e5e-4b8c-b977-02ffe17b544f",
       "dependsOn": []
     },
     {
-      "ref": "29bb9594-cf8d-423a-a386-a574bbe39bab",
+      "ref": "c24c168f-605c-497b-819e-1a7b54628186",
       "dependsOn": []
     },
     {
-      "ref": "2a4626e8-4897-4240-aa2e-531694fffc67",
+      "ref": "c34e52bf-0ca8-4af7-9a8d-d3ba00923db4",
       "dependsOn": []
     },
     {
-      "ref": "2c9b7613-7b45-4d86-956f-7825ccbfcb7e",
-      "dependsOn": []
-    },
-    {
-      "ref": "2dc725f4-138e-4f0e-988b-658229c7eb35",
-      "dependsOn": []
-    },
-    {
-      "ref": "2ee02bf3-491d-40a5-a713-7b758e4778dd",
-      "dependsOn": []
-    },
-    {
-      "ref": "30c6f0dd-be89-40bf-9680-3626ed5a53b1",
-      "dependsOn": []
-    },
-    {
-      "ref": "32699f1c-cef4-457c-980b-9abac11a09f5",
-      "dependsOn": []
-    },
-    {
-      "ref": "3550bd28-2906-43c7-94fd-1f0bae57bb17",
-      "dependsOn": []
-    },
-    {
-      "ref": "389dcf00-a844-4d32-9e3e-afe5014af207",
-      "dependsOn": []
-    },
-    {
-      "ref": "3a92ce69-1683-406c-a8d5-ce4a8a6d68dd",
-      "dependsOn": []
-    },
-    {
-      "ref": "4e7a588c-5d62-467b-a8f9-650b100b0c3b",
-      "dependsOn": []
-    },
-    {
-      "ref": "52a132f1-94aa-4cb0-a73e-b28c0a81959f",
-      "dependsOn": []
-    },
-    {
-      "ref": "59529d6d-2233-4301-876c-e7bfaea136e5",
-      "dependsOn": []
-    },
-    {
-      "ref": "6079e813-023f-43e9-bce3-1639cbeefbc9",
-      "dependsOn": []
-    },
-    {
-      "ref": "80e0a6af-c637-4590-884b-9fff234243f6",
-      "dependsOn": []
-    },
-    {
-      "ref": "817874a6-665e-4136-a6e8-ff44d5d3b313",
-      "dependsOn": []
-    },
-    {
-      "ref": "84bb4f87-706c-42a7-9350-314956d291bb",
-      "dependsOn": []
-    },
-    {
-      "ref": "87089f74-e91c-47da-bdd4-31e193bf74ed",
-      "dependsOn": []
-    },
-    {
-      "ref": "87b9fa5b-7166-47a8-abb0-9b9d346998d6",
-      "dependsOn": []
-    },
-    {
-      "ref": "9738687d-d347-4517-b6d4-b19f64879e82",
-      "dependsOn": []
-    },
-    {
-      "ref": "978ca138-022d-4140-aae5-e5b1d3264a5f",
-      "dependsOn": []
-    },
-    {
-      "ref": "9e5fe54e-d246-4843-930e-2562311dfdb7",
-      "dependsOn": []
-    },
-    {
-      "ref": "9f29b290-4835-4729-8d3a-4aa4ee5edd31",
-      "dependsOn": []
-    },
-    {
-      "ref": "a09077c5-607f-4071-bee0-299a7f9bc2db",
-      "dependsOn": []
-    },
-    {
-      "ref": "a2ab48db-a74f-4482-83df-3e1128c03231",
-      "dependsOn": []
-    },
-    {
-      "ref": "af83ce5e-3913-4e25-bfdb-bfc86349d3e0",
-      "dependsOn": []
-    },
-    {
-      "ref": "affb19e2-9d0e-4d96-bb1f-8e86cf936b24",
-      "dependsOn": []
-    },
-    {
-      "ref": "b00e45ed-cc9e-4474-8571-a964de2f722b",
+      "ref": "c683e064-a875-460c-abaa-e370fa6d9ea0",
       "dependsOn": [
-        "054b0a34-b3be-4b31-8301-120243dc20df",
-        "10a06b77-82fc-4a50-aaee-c176bc5e5051",
-        "13b538ec-bddb-46bd-8564-c228d3add7c4",
-        "21fd45df-bb7a-49f5-8681-f8ce75f63883",
-        "2578a0ef-07b5-4961-9dc2-40f50c8d0318",
-        "29bb9594-cf8d-423a-a386-a574bbe39bab",
-        "2dc725f4-138e-4f0e-988b-658229c7eb35",
-        "2ee02bf3-491d-40a5-a713-7b758e4778dd",
-        "32699f1c-cef4-457c-980b-9abac11a09f5",
-        "3550bd28-2906-43c7-94fd-1f0bae57bb17",
-        "52a132f1-94aa-4cb0-a73e-b28c0a81959f",
-        "59529d6d-2233-4301-876c-e7bfaea136e5",
-        "6079e813-023f-43e9-bce3-1639cbeefbc9",
-        "87089f74-e91c-47da-bdd4-31e193bf74ed",
-        "87b9fa5b-7166-47a8-abb0-9b9d346998d6",
-        "9738687d-d347-4517-b6d4-b19f64879e82",
-        "9e5fe54e-d246-4843-930e-2562311dfdb7",
-        "9f29b290-4835-4729-8d3a-4aa4ee5edd31",
-        "a09077c5-607f-4071-bee0-299a7f9bc2db",
-        "a2ab48db-a74f-4482-83df-3e1128c03231",
-        "af83ce5e-3913-4e25-bfdb-bfc86349d3e0",
-        "affb19e2-9d0e-4d96-bb1f-8e86cf936b24",
-        "d589592a-1f02-4cf1-b6a5-56b57d37c1c2",
-        "da190a21-27fc-4490-8e96-04261bfe5b2e",
-        "e68116ad-4c6f-4ad1-ac90-7a5de80dc5ee",
-        "ea7e38bb-dd51-4315-9dee-71015505d86c",
-        "eb742e08-bbf8-45d4-af2b-6402e9b10a30",
-        "ed29112d-d294-47bb-b0b8-9cebe5ab8f56",
-        "f59620b7-4ee1-41f1-9395-eaecd26663bb",
-        "f82bfd0a-657d-48cd-a174-0194bd5dc3ed",
-        "fa765d6d-67ce-4aba-ac71-d7989cb185c9",
+        "02b610af-dccd-4ca4-8123-3800f77b6ea5",
+        "06d38e5c-25ea-408d-ba96-0c3b71e8ed1c",
+        "0c12978b-3448-4feb-9bfe-71cb13cff7ac",
+        "14a9598c-1963-4c9c-805d-f49ddce9c924",
+        "198f9cfb-c477-4e31-9d95-a231cea0b83a",
+        "2b4e3ecc-8236-4d7c-936f-ef183b4b2a36",
+        "32735b17-2e2f-4a3a-b085-db590dd123c1",
+        "475cefae-c352-4008-a2b0-823a8c5a0590",
+        "5131eaee-c323-4235-98f8-e449ca6fbff2",
+        "54e94c0d-5f3e-42ed-9649-2e6da0a20241",
+        "5c583edc-553c-4111-a591-1a94b5e213eb",
+        "5f8d3ff5-5bd2-4e7f-8283-657d98c8d676",
+        "602efb06-6e5c-4fa2-af6e-2da43edb7998",
+        "669b4efa-c44f-4d4d-a713-e7754bdd8fb5",
+        "8747da78-9900-4f8b-ab54-7dae6c262465",
+        "8f39894d-9507-4ee7-8c3a-7dfe82ec12f4",
+        "9744daea-39d2-4f14-ba12-240102f99245",
+        "985070eb-cbdf-4e6a-a813-366bd86409fc",
+        "98daf6c9-a11e-459e-bee4-135ab73b00bc",
+        "a56abfd6-04c5-404c-8f28-6b79a3be5243",
+        "ac88f522-2e8a-4065-a8b1-268254a459ef",
+        "b179f51c-ae3d-43a9-a733-8631b4509f7a",
+        "ce088089-8dd3-4a50-9150-06b6beb8bd17",
+        "ce80d650-c96c-4eba-9ea4-322643b4c5d7",
+        "d46e76a8-58d7-4b01-9d47-98d97084ff6e",
+        "d95056c5-54a4-45a8-b430-27ac8c345b99",
+        "dcc158ad-9b6d-4f3f-ad0f-7d4e25c4b20c",
+        "ec1a63bc-687f-49c7-90ec-233e6957538c",
+        "f1a1d7ce-3652-4a54-a7b0-ab4936d92cc9",
+        "f509719f-bb15-4691-98f2-f543ae91f1b9",
+        "f72467b3-87b0-4fd7-93fc-84e102c7f222",
         "pkg:pypi/a2wsgi@1.10.10",
         "pkg:pypi/aiosmtplib@5.1.3",
         "pkg:pypi/aiosqlite@0.22.1",
@@ -3334,6 +3375,7 @@
         "pkg:pypi/pathlib-abc@0.5.2",
         "pkg:pypi/pathspec@1.1.1",
         "pkg:pypi/pendulum@3.3.0",
+        "pkg:pypi/prometheus-client@0.26.0",
         "pkg:pypi/psutil@7.2.2",
         "pkg:pypi/pycparser@3.12",
         "pkg:pypi/pydantic-core@2.50.2",
@@ -3374,91 +3416,63 @@
       ]
     },
     {
-      "ref": "b0368b7d-37fd-45a0-9ef5-de9fd003a1c6",
+      "ref": "c8bffb58-2dd2-4f74-922d-b1b403be2c3a",
       "dependsOn": []
     },
     {
-      "ref": "b8518c7e-4d25-49fe-a0d2-c610b6c33bd5",
+      "ref": "ce088089-8dd3-4a50-9150-06b6beb8bd17",
       "dependsOn": []
     },
     {
-      "ref": "c0fe5548-978d-4ae7-8a0f-c8a5f370b424",
+      "ref": "ce80d650-c96c-4eba-9ea4-322643b4c5d7",
       "dependsOn": []
     },
     {
-      "ref": "c3cf550a-0415-4cc7-828e-9e1c79424fdb",
+      "ref": "d371d969-8cea-4456-896c-9f97afedb437",
       "dependsOn": []
     },
     {
-      "ref": "c79a1f8f-250d-4bce-a00b-1f62d5031c2c",
+      "ref": "d46e76a8-58d7-4b01-9d47-98d97084ff6e",
       "dependsOn": []
     },
     {
-      "ref": "cc62403a-fc73-49cb-9885-74da5e04bc2f",
+      "ref": "d68fa40d-3a05-4522-a4cc-1d16d254fe72",
       "dependsOn": []
     },
     {
-      "ref": "ccd53f2c-70fe-4583-b7e6-c2b207e75f50",
+      "ref": "d95056c5-54a4-45a8-b430-27ac8c345b99",
       "dependsOn": []
     },
     {
-      "ref": "d589592a-1f02-4cf1-b6a5-56b57d37c1c2",
+      "ref": "dbaef24b-0d62-4a24-9503-abf20b1473d2",
       "dependsOn": []
     },
     {
-      "ref": "d7932281-b008-496b-95f5-079e7fdd8313",
+      "ref": "dcc158ad-9b6d-4f3f-ad0f-7d4e25c4b20c",
       "dependsOn": []
     },
     {
-      "ref": "d8337d5a-a988-4888-9d63-e48857f8f232",
+      "ref": "e76a8311-eaa9-4b7d-9133-4b073f286a6f",
       "dependsOn": []
     },
     {
-      "ref": "da190a21-27fc-4490-8e96-04261bfe5b2e",
+      "ref": "e9e4977d-3017-4df7-9552-e98b78e3db62",
       "dependsOn": []
     },
     {
-      "ref": "e0ca305d-1bfb-49df-94de-379098086590",
+      "ref": "ec1a63bc-687f-49c7-90ec-233e6957538c",
       "dependsOn": []
     },
     {
-      "ref": "e56016fc-d69e-4335-aadd-3f6f2ddfd003",
+      "ref": "f1a1d7ce-3652-4a54-a7b0-ab4936d92cc9",
       "dependsOn": []
     },
     {
-      "ref": "e68116ad-4c6f-4ad1-ac90-7a5de80dc5ee",
+      "ref": "f509719f-bb15-4691-98f2-f543ae91f1b9",
       "dependsOn": []
     },
     {
-      "ref": "e6a1fff1-0ec5-4975-b826-af53bfa9b149",
-      "dependsOn": []
-    },
-    {
-      "ref": "ea7e38bb-dd51-4315-9dee-71015505d86c",
-      "dependsOn": []
-    },
-    {
-      "ref": "eb742e08-bbf8-45d4-af2b-6402e9b10a30",
-      "dependsOn": []
-    },
-    {
-      "ref": "ed29112d-d294-47bb-b0b8-9cebe5ab8f56",
-      "dependsOn": []
-    },
-    {
-      "ref": "f59620b7-4ee1-41f1-9395-eaecd26663bb",
-      "dependsOn": []
-    },
-    {
-      "ref": "f82bfd0a-657d-48cd-a174-0194bd5dc3ed",
-      "dependsOn": []
-    },
-    {
-      "ref": "fa765d6d-67ce-4aba-ac71-d7989cb185c9",
-      "dependsOn": []
-    },
-    {
-      "ref": "fbee6097-2271-4bf8-b0a3-cf6116f124aa",
+      "ref": "f72467b3-87b0-4fd7-93fc-84e102c7f222",
       "dependsOn": []
     },
     {
@@ -3875,6 +3889,10 @@
     },
     {
       "ref": "pkg:pypi/platformdirs@4.14.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "pkg:pypi/prometheus-client@0.26.0",
       "dependsOn": []
     },
     {

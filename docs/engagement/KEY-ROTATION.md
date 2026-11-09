@@ -34,9 +34,10 @@ The test `test_old_curated_parquet_still_readable_after_rotation` builds the mar
 ## What changes for the user
 
 - Tokens change. The same patient gets an unrelated token under each key. The test `test_tokens_do_not_link_across_versions` checks this.
-- Marts that hold no tokens, such as the readmission mart, give the same values under both keys.
+- Marts that hold no tokens, such as the readmission mart, give the same values when the whole warehouse is built under one key.
 - A long-term join across versions needs a controlled re-tokenization job. That job would run inside the trusted zone, where raw ids are known. It is not built. Without it, a patient seen under `v1` and `v2` looks like two patients.
-- Incremental tables keep old tokens in old rows. A full rebuild from the raw data gives one key id for all rows.
+- The raw tables store tokens, not source ids. Rows loaded before a rotation keep their old tokens, and a dbt full refresh does not change them. Only a re-load of the landing blobs into a new warehouse gives one key id for all rows.
+- A warehouse that holds rows from two key versions counts a patient seen under both keys as two patients. A readmission that crosses the rotation date is not found. The rotation test builds each version in its own warehouse, so it does not cover this case.
 
 ## Revocation
 

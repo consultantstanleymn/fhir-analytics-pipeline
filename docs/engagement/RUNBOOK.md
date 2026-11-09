@@ -13,6 +13,8 @@ Symptom: the task `quarantine_gate` fails with "quarantine share ... is above th
 
 The marts do not change when the gate stops a run.
 
+Known gap: the gate counts only the rows that the current attempt loads. The rows of the stopped day stay in the raw tables, and the load log marks those blobs as loaded. A re-run loads nothing, so the gate passes, and dbt then builds the marts with the good rows of that day. If those rows must not reach the marts, remove them before the re-run (see "Load the same day again" in `docs/RUNBOOK.md`).
+
 ## The marts-late alert fired
 
 Symptom: `FhirMartsLate` fires after 06:00 UTC.
@@ -21,6 +23,16 @@ Symptom: `FhirMartsLate` fires after 06:00 UTC.
 2. Check the landing blobs for today. If they are missing, the source has not sent them.
 3. Fix the cause and run the DAG for today.
 4. Note the late day. Two late days in 28 days breach the freshness objective.
+
+## Upgrade: fct_encounters needs one full refresh
+
+The incremental model `fct_encounters` selects new rows by raw load time. It has a new column, `source_loaded_at`, and `on_schema_change='fail'`. A warehouse built before this change stops with a schema-change error. Rebuild the model once:
+
+```
+cd dbt/fhir_analytics && DUCKDB_PATH=... ../../.venv-dbt/bin/dbt run --full-refresh --select fct_encounters --profiles-dir .
+```
+
+Then run the normal build. A new warehouse does not need this step. Reason: `docs/DECISIONS.md`, entry 6.
 
 ## Key rotation
 

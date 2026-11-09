@@ -62,6 +62,12 @@ Choice: 28-day window, target 96.4 percent.
 
 Reason: a 28-day window is short enough to react to a change and long enough to show a trend. One late day is a warning. Two late days in a window show a real problem.
 
+Other option: keep 99 percent and use a window of 100 days or more (1 late day allowed). That window reacts more slowly to a change, so it was not chosen.
+
+This target is less strict than the first goal. `docs/engagement/ACCEPTANCE.md` (F-6) records both.
+
+Measured result: none. The pipeline has no real run history, so no on-time ratio was measured. The promtool tests prove the rule logic on synthetic series only (see `docs/engagement/evidence/promtool-freshness.txt`).
+
 ## Alerts
 
 | Alert | Fires when | Severity |

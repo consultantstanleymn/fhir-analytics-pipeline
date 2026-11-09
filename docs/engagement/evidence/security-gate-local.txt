@@ -60,3 +60,15 @@ exit 0
 === actionlint .github/workflows/security.yml
 exit 0
 === trivy SBOM: 216 library components from app.lock and dbt.lock, file sbom-source.cdx.json
+
+=== refresh 2026-11-09 12:20 UTC at code commit 13717151cf991c6d52450949ad2fe7a11e368ce9 (same code as 3eed2c4); reason: prometheus-client was added to app.lock after the first run
+=== $TV/bin/pip-audit -r requirements/app.lock --no-deps --disable-pip
+No known vulnerabilities found
+exit 0
+=== $TV/bin/pip-audit -r requirements/dbt.lock --no-deps --disable-pip
+No known vulnerabilities found
+exit 0
+=== trivy fs --scanners vuln,license --severity HIGH,CRITICAL on copies of both lock files named requirements.txt
+app/requirements.txt pip: 0 vulnerabilities, 0 license findings
+dbt/requirements.txt pip: 0 vulnerabilities, 0 license findings
+=== trivy SBOM regenerated: 217 library components from app.lock and dbt.lock (adds prometheus-client), file sbom-source.cdx.json

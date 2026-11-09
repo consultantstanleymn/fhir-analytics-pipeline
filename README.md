@@ -36,7 +36,7 @@ Each line ran on one laptop on 2026-11-09. Raw output is in `docs/engagement/evi
 | k-anonymity (k=5) at publish: no group under k reaches the curated Parquet file | `.venv/bin/python -m pytest tests/test_kanon.py -q` | `docs/engagement/evidence/kanon-report.txt` |
 | Versioned HMAC keys: a key id in each token, old files readable after a rotation | `.venv/bin/python -m pytest tests/test_key_versions.py -v` | `docs/engagement/evidence/key-versions.txt` |
 | Late-update fix: an update with an old `lastUpdated` is applied, nothing else changes, a re-run is idempotent | `.venv/bin/python -m pytest -m dbt -v` | `docs/engagement/evidence/dbt-tests.txt` and `docs/DECISIONS.md` entry 6 |
-| Pipeline metrics and a 06:00 freshness alert, with rule tests that promtool ran | `podman run ... promtool test rules` (see the file) | `docs/engagement/evidence/promtool-freshness.txt` |
+| Pipeline metrics and a 06:00 freshness alert, with rule tests that promtool ran. SLO target: 96.4 percent of days over 28 days (the first goal of 99 percent allows no late day; see `docs/engagement/OBSERVABILITY.md`). No real on-time ratio was measured | `podman run ... promtool test rules` (see the file) | `docs/engagement/evidence/promtool-freshness.txt` |
 | Failure lab: corrupt blob, schema drift (new and removed field), late update, Azurite down | `.venv/bin/python scripts/failure_lab.py --all` | `docs/engagement/evidence/failure-lab.txt` |
 | bandit, semgrep, pip-audit, gitleaks and an SBOM pass | commands in `docs/engagement/SECURITY-GATE.md` | `docs/engagement/evidence/security-gate-local.txt` |
 
@@ -59,7 +59,7 @@ Each line ran on one laptop on 2026-11-09. Raw output is in `docs/engagement/evi
 - Azure is used only through the Blob Storage SDK against the Azurite emulator, and through Bicep that is compiled and linted. Nothing is deployed to an Azure subscription. No Data Factory, Synapse, AKS or other Azure service is used.
 - Airflow runs on a single machine. Tests use `dag.test()`. A scheduler and web server were not run for this project.
 - Validation uses the R4B models of `fhir.resources` (FHIR 4.3.0) plus a short table of required code bindings. It does not use profiles such as US Core and does not check terminology servers.
-- The incremental model skips an update that is older than the newest row already loaded (see `docs/DECISIONS.md`, entry 6).
+- The incremental model `fct_encounters` now selects rows by raw load time, so a late update is applied (see `docs/DECISIONS.md`, entry 6). An existing warehouse needs one `dbt run --full-refresh --select fct_encounters` after this change (see `docs/engagement/RUNBOOK.md`).
 
 ## Results (real, recorded 2026-11-07 on one laptop)
 
@@ -74,7 +74,7 @@ Each line ran on one laptop on 2026-11-09. Raw output is in `docs/engagement/evi
 | Bicep | build and lint with 0 warnings, ARM policy test passes |
 | ruff, mypy (strict), sqlfluff | clean |
 
-CI status: the workflow in `.github/workflows/ci.yml` has five jobs (`lint`, `unit`, `dbt`, `airflow-e2e`, `bicep`). It has not run on GitHub yet, because the repository has not been pushed. I ran the same commands for each job locally. Do not treat the project as CI-verified until the jobs are green on `main`.
+CI status: the workflow in `.github/workflows/ci.yml` had five jobs (`lint`, `unit`, `dbt`, `airflow-e2e`, `bicep`) when these results were recorded. I ran the same commands for each job locally. The repository is now on GitHub. The engagement work added jobs and a security workflow. No GitHub Actions run of the new work was started or checked, so do not treat the new work as CI-verified.
 
 ## Quick start
 
